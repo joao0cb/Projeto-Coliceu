@@ -1,7 +1,10 @@
 package com.example.projetocoliceu.data.model
 
+import java.util.UUID
+
 data class Artefato(
     // 1. Identificação Espacial (Para o mapa e localização)
+    val idCartao: String = UUID.randomUUID().toString(),
     val quadra: String,
     val area: String,
     val sondagem: String,
@@ -20,9 +23,6 @@ data class Artefato(
     val data: String,
     val pesquisador: String,
     val obs: String?,
-
-    // Campos Internos
-    val idCartao: String,
 
     // Coordenadas relativas para posicionar no CustomView (mapa)
     val xRelativo: Float, // Posição X dentro da quadra (0.0 a 1.0)
