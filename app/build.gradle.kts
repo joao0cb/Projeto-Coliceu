@@ -46,4 +46,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    // Retrofit: Biblioteca para comunicação de rede (HTTP)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // Retrofit Converter: Converte o JSON do Spring Boot em objetos Kotlin (usando Gson)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    // Suporte a Coroutines (assíncrono) para requisições de rede
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
 }
