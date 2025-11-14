@@ -26,5 +26,6 @@ data class Artefato(
 
     // Coordenadas relativas para posicionar no CustomView (mapa)
     val xRelativo: Float, // Posição X dentro da quadra (0.0 a 1.0)
-    val yRelativo: Float
- )
+    val yRelativo: Float,
+    val fotoCaminho: String?
+)

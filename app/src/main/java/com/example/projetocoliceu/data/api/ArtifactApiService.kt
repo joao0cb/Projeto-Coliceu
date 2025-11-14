@@ -2,6 +2,7 @@ package com.example.projetocoliceu.data.api
 
 import com.example.projetocoliceu.data.model.Artefato
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -25,4 +26,8 @@ interface ArtifactApiService {
     // Sugestão: Você também precisará de funções para atualizar (PUT) e deletar (DELETE)
     @PUT("api/artifacts/{id}")
     suspend fun updateArtifact(@Path("id") id: String, @Body ficha: Artefato): Artefato
+
+    @DELETE("api/v1/artefatos/{id}") // Assumindo que seu Spring Boot usa /api/v1/artefatos/{id}
+    suspend fun deleteArtifact(@Path("id") id: String)
+    fun fetchArtifactById(idCartao: String): Artefato
 }
