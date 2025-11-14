@@ -12,8 +12,6 @@ import com.example.projetocoliceu.data.model.toArtefatoEntity
 import com.example.projetocoliceu.data.model.Artefato
 import com.example.projetocoliceu.data.db.ArtefatoDao
 import com.example.projetocoliceu.data.api.ArtifactApiService
-import com.example.projetocoliceu.data.db.ArtefatoEntity
-import com.example.projetocoliceu.worker.SyncWorker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
