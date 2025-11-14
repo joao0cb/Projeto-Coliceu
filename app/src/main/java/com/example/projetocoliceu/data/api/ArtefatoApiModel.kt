@@ -4,7 +4,7 @@ import java.util.UUID
 
 class ArtefatoApiModel (
     // 1. Identificação Espacial (Para o mapa e localização)
-    val idCartao: String = UUID.randomUUID().toString(),
+    val id: String = UUID.randomUUID().toString(),
     val quadra: String,
     val area: String,
     val sondagem: String,

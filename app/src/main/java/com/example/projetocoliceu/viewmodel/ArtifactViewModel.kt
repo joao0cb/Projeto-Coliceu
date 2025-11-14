@@ -37,9 +37,9 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
     val isLoading: LiveData<Boolean> = _isLoading
 
     // --- CAMPOS DO FORMULÁRIO (LiveData BINDING) ---
+    val obs = MutableLiveData<String>()
 
     val tipo = MutableLiveData<String>() // Mapeia para 'material'
-    val profundidade = MutableLiveData<String>() // Campo não utilizado no Artefato.kt, mantido para o formulário.
     val area = MutableLiveData<String>()
     val pesquisador = MutableLiveData<String>("Pesquisador Padrão")
     val fotoCaminho = MutableLiveData<String>()
@@ -47,15 +47,16 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
     // --- FUNÇÕES DE INJEÇÃO E PREPARAÇÃO ---
 
     // 1. Injeta as coordenadas iniciais do Mapa
-    fun setInitialCoordinates(quadra: String, xRelativo: Float, yRelativo: Float) {
+    fun setInitialCoordinates(quadra: String, xRelativo: Float, yRelativo: Float, sondagem: String = "N/A") {
         _initialQuadra.value = quadra
         _initialXRelativo.value = xRelativo
         _initialYRelativo.value = yRelativo
+        _initialSondagem.value = sondagem
         area.value = quadra
     }
 
     // 2. Injeta um Artefato existente para edição
-    fun setArtefatoParaEdicao(artefato: Artefato) {
+    fun setArtifactToEdition(artefato: Artefato) {
         _artefatoEditavel.value = artefato
         // Preenche os LiveDatas do formulário com os dados do artefato existente
         area.value = artefato.area
@@ -66,12 +67,12 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
 
     // --- FUNÇÃO PRINCIPAL DE SALVAR/ATUALIZAR (CRUD: C e U) ---
 
-    fun saveOrUpdateArtefato() {
+    fun saveOrUpdateArtifact() {
         // Validação: Verifique os campos essenciais
         if (tipo.value.isNullOrBlank() || area.value.isNullOrBlank()) {
-            _isLoading.value = false
             return
         }
+
 
         viewModelScope.launch {
             _isLoading.value = true
@@ -97,16 +98,17 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
                     pesquisador = pesquisador.value!!,
 
                     // CAMPOS DE DATA/LOGÍSTICA QUE SÃO SEMPRE ATUALIZADOS
-                    data = dataRegistroFormatada,
-                    obs = null // Supondo que obs também é um campo do formulário
-                    // ... (aplicar todos os campos que podem ser editados)
+                    data = artefatoExistente.data,
+                    obs = obs.value
+                    // Supondo que obs também é um campo do formulário
+
                 )
 
             } else {
                 // --- MODO CRIAÇÃO (CREATE) ---
                 artefatoFinal = Artefato(
                     // Geração de IDs e Coordenadas
-                    idCartao = UUID.randomUUID().toString(),
+                    id = UUID.randomUUID().toString(),
                     quadra = _initialQuadra.value!!,
                     xRelativo = _initialXRelativo.value!!,
                     yRelativo = _initialYRelativo.value!!,
@@ -126,8 +128,8 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
 
                     // Logística
                     data = dataRegistroFormatada,
-                    obs = null,
-                    fotoCaminho = null
+                    obs = obs.value,
+                    fotoCaminho = fotoCaminho.value
                 )
             }
 
@@ -147,6 +149,4 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
         }
     }
 
-    // As funções vazias que estavam causando o erro foram removidas.
-    // A função 'updateExistingArtefato' foi incorporada à 'saveOrUpdateArtefato'.
 }

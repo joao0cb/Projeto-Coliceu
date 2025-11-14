@@ -1,5 +1,6 @@
 package com.example.projetocoliceu.data.db
 
+import com.example.projetocoliceu.data.model.Artefato
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID
@@ -8,10 +9,9 @@ import java.util.UUID
 @Entity(tableName = "artefatos")
 data class ArtefatoEntity(
     // 1. Identificação
-    @PrimaryKey(autoGenerate = true)
-    // Inicialização direta no construtor. Use Long/Int se 'autoGenerate = true' for verdadeiro.
-    // Se você quer um UUID, NÃO use 'autoGenerate = true'. Use a linha 19 e remova o autoGenerate.
-    val idCartao: String = UUID.randomUUID().toString(),
+    @PrimaryKey
+    val id: String = UUID.randomUUID().toString(),
+
 
     val quadra: String,
     val area: String,
@@ -38,4 +38,6 @@ data class ArtefatoEntity(
     val fotoCaminho: String?,
 
     val syncStatus: Int
+
 )
+
