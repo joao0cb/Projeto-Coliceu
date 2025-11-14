@@ -8,6 +8,7 @@ import androidx.work.WorkManager
 import com.example.projetocoliceu.data.api.ArtifactApiService
 import com.example.projetocoliceu.data.db.ArtefatoDao // Assumindo 'local' para o DAO
 import com.example.projetocoliceu.data.db.ArtefatoEntity // Usaremos a Entity no Repositório
+import com.example.projetocoliceu.data.model.Artefato
 import com.example.projetocoliceu.worker.SyncWorker // Classe que criaremos
 
 import kotlinx.coroutines.flow.Flow
