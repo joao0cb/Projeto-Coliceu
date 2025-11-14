@@ -1,5 +1,6 @@
 package com.example.projetocoliceu.data.api
 
+import com.example.projetocoliceu.data.db.ArtefatoEntity
 import com.example.projetocoliceu.data.model.Artefato
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -15,7 +16,7 @@ interface ArtifactApiService {
     // Usado para buscar todos os artefatos do servidor.
     @GET("api/artifacts")
     // 'suspend' indica que esta é uma função assíncrona (não trava a interface)
-    suspend fun fetchAllArtifacts(): List<Artefato>
+    suspend fun fetchAllArtifacts(): List<ArtefatoEntity>
 
     // CHAMA O ENDPOINT POST: /api/artifacts
     // Usado para enviar uma nova ficha (Artefato) para o servidor salvar.

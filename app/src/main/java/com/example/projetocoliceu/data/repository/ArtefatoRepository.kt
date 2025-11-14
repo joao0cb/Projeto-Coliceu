@@ -1,103 +1,143 @@
 package com.example.projetocoliceu.data.repository
 
 import android.content.Context
+// 🛠️ Importações WorkManager (Corrigindo "Unresolved reference 'Builder'")
 import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.projetocoliceu.data.api.ArtifactApiService
-import com.example.projetocoliceu.data.db.ArtefatoDao // Assumindo 'local' para o DAO
-import com.example.projetocoliceu.data.db.ArtefatoEntity // Usaremos a Entity no Repositório
+import com.example.projetocoliceu.data.model.toArtefatoModel
+import com.example.projetocoliceu.data.model.toArtefatoEntity
 import com.example.projetocoliceu.data.model.Artefato
-import com.example.projetocoliceu.worker.SyncWorker // Classe que criaremos
-
+import com.example.projetocoliceu.data.db.ArtefatoDao
+import com.example.projetocoliceu.data.api.ArtifactApiService
+import com.example.projetocoliceu.data.db.ArtefatoEntity
+import com.example.projetocoliceu.worker.SyncWorker
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
 
 class ArtefatoRepository(
     private val apiService: ArtifactApiService,
-    private val dao: ArtefatoDao, // <-- Adicionado o acesso ao DB Local (Room)
-    private val context: Context  // <-- Adicionado para o WorkManager
+    private val dao: ArtefatoDao,
+    private val context: Context
 ) {
 
-    // -------------------------------------------------------------------------
-    // R - READ ALL (Leitura Reativa - SEMPRE LÊ DO ROOM)
-    // -------------------------------------------------------------------------
+    // Constantes para o WorkManager e Status de Sincronização
+    companion object {
+        const val PENDING_SYNC = 1
+        const val PENDING_DELETE = 2
+        const val SYNCED = 0 // Adicionado para clareza
+    }
 
-    // Retorna um Flow da lista de Entidades. A UI se inscreve neste Flow.
-    fun getAllArtifacts(): Flow<List<ArtefatoEntity>> {
-        // Dispara a sincronização em background quando o app pede dados
+    // R - READ ALL
+    fun getAllArtifacts(): Flow<List<Artefato>> {
         startSyncWorker()
-
-        // Retorna a leitura do banco de dados local (Room)
         return dao.getAllArtefatos()
+            .map { entities ->
+                entities.map { it.toArtefatoModel() } // Corrigido o tipo de retorno
+            }
     }
 
-    // -------------------------------------------------------------------------
-    // C - CREATE & U - UPDATE (Escrita - SEMPRE ESCREVE PRIMEIRO NO ROOM)
-    // -------------------------------------------------------------------------
-
-    // Recebe a Entidade (que já tem o ID local/remoteId)
-    // Nota: O Room usa REPLACE, então este método lida com CREATE e UPDATE locais.
-    suspend fun saveArtifact(artefato: ArtefatoEntity): ArtefatoEntity {
-        // 1. Define o status como PENDENTE DE SINCRONIZAÇÃO (1)
-        val pendingArtefato = artefato.copy(syncStatus = 1)
-
-        // 2. Salva a alteração imediatamente no banco de dados local (offline)
-        dao.insert(pendingArtefato)
-
-        // 3. Agenda a sincronização para quando houver conexão
+    // C - CREATE & U - UPDATE (Local)
+    suspend fun saveArtifact(artefato: Artefato): Artefato {
+        // 🛠️ CORREÇÃO: Passando explicitamente o syncStatus (Corrigindo "No value passed for parameter 'syncStatus'")
+        val entityToSave = artefato.toArtefatoEntity(PENDING_SYNC)
+        dao.insert(entityToSave)
         startSyncWorker()
-
-        return pendingArtefato
+        return entityToSave.toArtefatoModel()
     }
 
-    // -------------------------------------------------------------------------
-    // D - DELETE (Exclusão - MARCA COMO PENDENTE DE EXCLUSÃO)
-    // -------------------------------------------------------------------------
-
-    suspend fun deleteArtifact(artefato: ArtefatoEntity) {
-        // 1. Marca o item localmente como PENDENTE DE EXCLUSÃO (2)
-        // Isso impede que o PULL remoto o re-insira antes que o PUSH o exclua remotamente
-        val deletePending = artefato.copy(syncStatus = 2)
+    // D - DELETE (Marca Local)
+    suspend fun deleteArtifact(artefato: Artefato) {
+        // 🛠️ CORREÇÃO: Passando explicitamente o syncStatus (Corrigindo "No value passed for parameter 'syncStatus'")
+        val deletePending = artefato.toArtefatoEntity(PENDING_DELETE)
         dao.update(deletePending)
-
-        // 2. Agenda a sincronização
         startSyncWorker()
     }
 
-
-    // -------------------------------------------------------------------------
-    // MÉTODOS DE SINCRONIZAÇÃO (Chamados APENAS pelo SyncWorker!)
-    // -------------------------------------------------------------------------
-
-    // R - READ ONE (Ainda útil para o Worker buscar um item remoto específico)
-    suspend fun fetchArtifactByIdRemote(idFicha: String): Artefato {
-        // Usamos o método da API original
-        return apiService.fetchArtifactById(idFicha)
+    // MÉTODOS AUXILIARES (Para o Worker)
+    suspend fun getPendingSyncArtifacts(): List<Artefato> {
+        val pendingEntities = dao.getPendingSyncArtefatos()
+        return pendingEntities.map { entity ->
+            entity.toArtefatoModel()
+        }
     }
 
-    // O WorkManager usará estes métodos para o PUSH/PULL
-    suspend fun createArtifactRemote(artefato: Artefato): Artefato = apiService.createArtifact(artefato)
-    suspend fun updateArtifactRemote(artefato: Artefato): Artefato = apiService.updateArtifact(artefato.idCartao, artefato)
-    suspend fun deleteArtifactRemote(idFicha: String) = apiService.deleteArtifact(idFicha)
-    suspend fun fetchAllArtifactsRemote(): List<Artefato> = apiService.fetchAllArtifacts()
-
-
     // -------------------------------------------------------------------------
-    // WORKER AGENDAMENTO (Função utilitária)
+    // MÉTODOS REMOTOS (Usados APENAS pelo SyncWorker para PUSH/PULL)
     // -------------------------------------------------------------------------
 
+    suspend fun fetchAllArtifactsRemote(): List<Artefato> {
+        // 🛠️ CORREÇÃO: Mapeando ArtefatoEntity para Artefato após a chamada da API
+        return apiService.fetchAllArtifacts().map { it.toArtefatoModel() }
+    }
+
+    /**
+     * PUSH: Envia um novo artefato para o servidor.
+     */
+    suspend fun createArtifactRemote(artefatoEntity: ArtefatoEntity): Artefato {
+        val artefatoModel = artefatoEntity.toArtefatoModel()
+        return apiService.createArtifact(artefatoModel)
+    }
+
+    /**
+     * PUSH: Atualiza um artefato existente no servidor.
+     */
+    suspend fun updateArtifactRemote(artefatoEntity: ArtefatoEntity): Artefato {
+        val artefatoModel = artefatoEntity.toArtefatoModel()
+        return apiService.updateArtifact(artefatoEntity.id, artefatoModel)
+    }
+
+    suspend fun deleteArtifactRemote(idCartao: String) = apiService.deleteArtifact(idCartao)
+
+    /**
+     * Atualiza um artefato localmente e marca para sincronização.
+     * Lembre-se: este método é 'suspend' — chame dentro de coroutine (viewModelScope.launch {...}).
+     */
+    suspend fun updateArtifact(artefato: Artefato): Artefato {
+        // Converte o modelo para entidade (passando o status de sync pendente)
+        val entityToUpdate = artefato.toArtefatoEntity(PENDING_SYNC)
+
+        // Verifica se o registro existe localmente (opcional, mas útil para evitar surpresas)
+        val existing = dao.getArtefatoById(entityToUpdate.id)
+        if (existing == null) {
+            // Se você preferir, pode inserir em vez de lançar
+            // dao.insert(entityToUpdate)
+            // ou lançar para indicar erro:
+            throw IllegalStateException("Artefato com id ${entityToUpdate.id} não encontrado para atualização.")
+        }
+
+        // Atualiza no banco local (Room)
+        dao.update(entityToUpdate)
+
+        // Agenda sincronização (WorkManager)
+        startSyncWorker()
+
+        // Retorna o modelo atualizado
+        return entityToUpdate.toArtefatoModel()
+    }
+
+
+    // WORKER AGENDAMENTO
     private fun startSyncWorker() {
         val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED) // Só executa com internet
+            .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        // Cria uma requisição de trabalho que será executada uma única vez
         val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
             .setConstraints(constraints)
+            .addTag("sync_artefato_data") // Boa prática: adicione uma tag
             .build()
 
-        // Coloca a requisição na fila do WorkManager
-        WorkManager.getInstance(context).enqueue(syncRequest)
+        // Usa o ENQUEUE_UNIQUE_WORK para evitar agendar múltiplos workers
+        WorkManager.getInstance(context)
+            .enqueueUniqueWork(
+                "sync_artefato_data",
+                ExistingWorkPolicy.KEEP,
+                syncRequest
+            )
+
     }
 }
