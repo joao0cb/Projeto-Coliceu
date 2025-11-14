@@ -1,8 +1,8 @@
-package com.example.projetocoliceu.data.model
+package com.example.projetocoliceu.data.api
 
 import java.util.UUID
 
-data class Artefato(
+class ArtefatoApiModel (
     // 1. Identificação Espacial (Para o mapa e localização)
     val idCartao: String = UUID.randomUUID().toString(),
     val quadra: String,
