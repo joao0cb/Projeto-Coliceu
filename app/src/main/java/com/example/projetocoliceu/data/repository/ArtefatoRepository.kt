@@ -1,4 +1,6 @@
 package com.example.projetocoliceu.data.repository
 
-class ArtefatoRepository {
+import com.example.projetocoliceu.data.api.ArtifactApiService
+
+class ArtefatoRepository(apiService: ArtifactApiService) {
 }

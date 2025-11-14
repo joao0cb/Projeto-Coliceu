@@ -7,13 +7,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.activity.viewModels
 // Necessário para encontrar IDs de recursos (R.id.mapaArqueologicoView)
-import com.example.projetocoliceu.R
 import com.example.projetocoliceu.data.api.RetrofitClient
 import com.example.projetocoliceu.data.repository.ArtefatoRepository
 import com.example.projetocoliceu.ui.map.MapaArqueologico
 import com.example.projetocoliceu.viewmodel.MapViewModel
 import com.example.projetocoliceu.viewmodel.MapViewModelFactory // IMPORT NECESSÁRIO!
-import com.example.projetocoliceu.viewmodel.ArtifactViewModel // Opcional por enquanto, mas mantido
 
 class MainActivity : AppCompatActivity() {
 
