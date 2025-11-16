@@ -9,10 +9,9 @@ import android.view.MotionEvent
 import android.view.View
 import com.example.projetocoliceu.data.model.Artefato
 import com.example.projetocoliceu.viewmodel.MapViewModel
-import kotlin.math.roundToInt
 
 // Esta classe herda de View e serve como o seu mapa cartesiano customizado.
-class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, attrs){
 
     // O ViewModel será injetado pela Activity
     private lateinit var viewModel: MapViewModel

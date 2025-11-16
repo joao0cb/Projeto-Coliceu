@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData // Essencial para converter Flow -> LiveData
 import com.example.projetocoliceu.data.model.Artefato
 import com.example.projetocoliceu.data.repository.ArtefatoRepository
+import java.util.UUID
 
 class MapViewModel(private val repository: ArtefatoRepository) : ViewModel() {
     val artefatos: LiveData<List<Artefato>> =
@@ -21,17 +22,27 @@ class MapViewModel(private val repository: ArtefatoRepository) : ViewModel() {
      */
     fun startNewArtefato(nomeQuadra: String, xRelativo: Float, yRelativo: Float) {
         // Exemplo de criação do objeto inicial
-        val novoCartao = Artefato(
-            id = java.util.UUID.randomUUID().toString(),
+        val novo = Artefato(
+            id = UUID.randomUUID().toString(),
             quadra = nomeQuadra,
+            area = "",
+            sondagem = "",
+            pontoGPS = null,
+            nivel = "",
+            camada = "",
+            decapagem = null,
+            material = "",
+            quantidade = 1,
+            data = "",
+            pesquisador = "",
+            obs = null,
             xRelativo = xRelativo,
             yRelativo = yRelativo,
-            // Preencha os outros campos com valores padrão ou nulos
-            area = "", nivel = "", material = "", data = "", pesquisador = "", obs = null
+            fotoCaminho = null
         )
 
         // Dispara o evento de navegação para a Activity
-        _navigationEvent.value = novoCartao
+        _navigationEvent.value = novo
     }
 }
 
