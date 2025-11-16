@@ -64,9 +64,6 @@ class ArtefatoRepository(
         }
     }
 
-    // -------------------------------------------------------------------------
-    // MÉTODOS REMOTOS (Usados APENAS pelo SyncWorker para PUSH/PULL)
-    // -------------------------------------------------------------------------
 
     suspend fun fetchAllArtifactsRemote(): List<Artefato> {
         // 🛠️ CORREÇÃO: Mapeando ArtefatoEntity para Artefato após a chamada da API
