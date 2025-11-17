@@ -28,6 +28,13 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
     private val _initialXRelativo = MutableLiveData<Float>()
     private val _initialYRelativo = MutableLiveData<Float>()
 
+    // Variáveis externas (públicas e imutáveis)
+    val initialXRelativo: LiveData<Float>
+        get() = _initialXRelativo // Expondo o valor para leitura
+
+    val initialYRelativo: LiveData<Float>
+        get() = _initialYRelativo // Expondo o valor para leitura
+
     // --- ESTADO DA VIEW E FEEDBACK ---
 
     private val _saveSuccess = MutableLiveData<Boolean>()

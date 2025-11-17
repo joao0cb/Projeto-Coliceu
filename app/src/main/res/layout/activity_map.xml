@@ -8,8 +8,8 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/app_bar_top"
-        android:layout_width="1281dp"
-        android:layout_height="66dp"
+        android:layout_width="1285dp"
+        android:layout_height="83dp"
         android:background="@color/primaryColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,10 +41,11 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="83dp"
-        android:layout_height="66dp"
+        android:layout_width="88dp"
+        android:layout_height="87dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
@@ -55,47 +56,79 @@
         android:layout_width="409dp"
         android:layout_height="75dp"
         android:layout_marginTop="104dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_adicionar"
-            android:layout_width="112dp"
-            android:layout_height="59dp"
-            android:layout_marginStart="96dp"
+            android:layout_width="137dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="100dp"
             android:layout_marginTop="8dp"
-            android:background="@color/selectColor"
-            android:text="Adicionar "
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:fontFamily="@font/passero_one"
+            android:text="Adicionar"
+            android:textColor="@color/fontColor"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/selectColor"
+            android:elevation="8dp"
+            app:cornerRadius="4dp"
+            android:stateListAnimator="@null"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_listar"
-            android:layout_width="112dp"
-            android:layout_height="59dp"
+            android:layout_width="137dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="256dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="48dp"
-            android:background="@color/selectColor"
+            android:fontFamily="@font/passero_one"
             android:text="Listar"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/fontColor"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/selectColor"
+            app:cornerRadius="4dp"
+            android:elevation="8dp"
+            android:stateListAnimator="@null"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
-        android:layout_width="523dp"
-        android:layout_height="69dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="104dp"
+        android:id="@+id/frameLayout2"
+        android:layout_width="528dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="128dp"
+        app:layout_constraintEnd_toStartOf="@+id/constraintLayout"
+        app:layout_constraintHorizontal_bias="0.346"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:layout_width="502dp"
+            android:layout_height="34dp"
+            android:fontFamily="@font/passero_one"
+            android:text="Adicione ou Liste os cartões de identificação"
+            android:shadowColor="#80000000"  android:shadowRadius="2.5"      android:shadowDx="1"          android:shadowDy="1"
+            android:textColor="@color/fontColor"
+            android:textSize="24sp"
+            android:textStyle="bold" />
     </FrameLayout>
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="81dp"
+        android:layout_height="76dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="100dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/bussola" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
