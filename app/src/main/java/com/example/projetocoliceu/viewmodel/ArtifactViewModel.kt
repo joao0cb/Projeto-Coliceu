@@ -15,61 +15,103 @@ import java.util.UUID
 class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel() {
 
     // --- ESTADO DE EDIÇÃO E COORDENADAS ---
-
-    // LiveData para armazenar o Artefato que está sendo editado. Se for null, é um novo cadastro.
     private val _artefatoEditavel = MutableLiveData<Artefato?>()
     val artefatoEditavel: LiveData<Artefato?> = _artefatoEditavel
 
-    // LiveData para armazenar as coordenadas iniciais passadas pelo mapa.
     private val _initialQuadra = MutableLiveData<String>()
     val initialQuadra: LiveData<String> = _initialQuadra
 
     private val _initialSondagem = MutableLiveData<String>()
+    val initialSondagem: LiveData<String> = _initialSondagem // Exposto para ser usado no Fragment
+
     private val _initialXRelativo = MutableLiveData<Float>()
+    val initialXRelativo: LiveData<Float>
+        get() = _initialXRelativo
+
     private val _initialYRelativo = MutableLiveData<Float>()
+    val initialYRelativo: LiveData<Float>
+        get() = _initialYRelativo
 
     // --- ESTADO DA VIEW E FEEDBACK ---
-
     private val _saveSuccess = MutableLiveData<Boolean>()
     val saveSuccess: LiveData<Boolean> = _saveSuccess
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    // ----------------------------------------------------------------------
     // --- CAMPOS DO FORMULÁRIO (LiveData BINDING) ---
+    // ----------------------------------------------------------------------
 
-    val tipo = MutableLiveData<String>() // Mapeia para 'material'
-    val profundidade = MutableLiveData<String>() // Campo não utilizado no Artefato.kt, mantido para o formulário.
-    val area = MutableLiveData<String>()
-    val pesquisador = MutableLiveData<String>("Pesquisador Padrão")
-    val fotoCaminho = MutableLiveData<String>()
+    // Coordenadas/Localização
+    val area = MutableLiveData<String>() // Obrigatório (ex: "C5")
+    val sondagem = MutableLiveData<String>() // Inicialmente preenchido pelo mapa
+    val pontoGPS = MutableLiveData<String?>() // Opcional
+
+    // Contexto Estratigráfico
+    val nivel = MutableLiveData<Int>() // Assume Int
+    val camada = MutableLiveData<String>()
+    val decapagem = MutableLiveData<String?>() // Opcional
+
+    // Detalhes do Achado
+    val material = MutableLiveData<String>() // Mapeia para 'tipo' (Cerâmica, Lítico)
+    val quantidade = MutableLiveData<Int>(1) // Default para 1
+    val fotoCaminho = MutableLiveData<String?>() // Opcional (caminho local)
+
+    // Logística e Observações
+    val pesquisador = MutableLiveData<String?>() // Assume pesquisador padrão será definido na view/injeção
+    val data = MutableLiveData<String?>() // Pode ser deixado para preenchimento automático
+    val obs = MutableLiveData<String?>() // Opcional
 
     // --- FUNÇÕES DE INJEÇÃO E PREPARAÇÃO ---
 
     // 1. Injeta as coordenadas iniciais do Mapa
-    fun setInitialCoordinates(quadra: String, xRelativo: Float, yRelativo: Float) {
+    fun setInitialCoordinates(quadra: String, xRelativo: Float, yRelativo: Float, sondagem: String = "N/A") {
         _initialQuadra.value = quadra
         _initialXRelativo.value = xRelativo
         _initialYRelativo.value = yRelativo
+        _initialSondagem.value = sondagem
+
+        // Preenche os campos do formulário com dados iniciais
         area.value = quadra
+        this.sondagem.value = sondagem
+
+        // Define valores padrão se estiver em modo de criação
+        if (_artefatoEditavel.value == null) {
+            nivel.value = 1
+            camada.value = "I"
+            // Preencher data atual (ou deixar a função save cuidar disso)
+        }
     }
 
     // 2. Injeta um Artefato existente para edição
-    fun setArtefatoParaEdicao(artefato: Artefato) {
+    fun setArtifactToEdition(artefato: Artefato) {
         _artefatoEditavel.value = artefato
+
         // Preenche os LiveDatas do formulário com os dados do artefato existente
         area.value = artefato.area
-        tipo.value = artefato.material // material
+        sondagem.value = artefato.sondagem
+        pontoGPS.value = artefato.pontoGPS
+
+        nivel.value = artefato.nivel.toIntOrNull() // Converte String para Int
+        camada.value = artefato.camada
+        decapagem.value = artefato.decapagem
+
+        material.value = artefato.material
+        quantidade.value = artefato.quantidade
+
         pesquisador.value = artefato.pesquisador
-        // ... (preencher todos os campos do formulário)
+        data.value = artefato.data
+        obs.value = artefato.obs
+        fotoCaminho.value = artefato.fotoCaminho
     }
 
     // --- FUNÇÃO PRINCIPAL DE SALVAR/ATUALIZAR (CRUD: C e U) ---
 
-    fun saveOrUpdateArtefato() {
+    fun saveOrUpdateArtifact() {
         // Validação: Verifique os campos essenciais
-        if (tipo.value.isNullOrBlank() || area.value.isNullOrBlank()) {
-            _isLoading.value = false
+        if (material.value.isNullOrBlank() || area.value.isNullOrBlank() || nivel.value == null) {
+            // Poderia emitir um erro aqui
             return
         }
 
@@ -79,55 +121,71 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
             val artefatoFinal: Artefato
             val isUpdating = _artefatoEditavel.value != null
 
-            // 1. Preparação da Data (String Formatada)
-            val timestamp = System.currentTimeMillis()
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val dataRegistroFormatada = dateFormat.format(Date(timestamp))
+            // 1. Preparação da Data (String Formatada) - Usa a data atual SOMENTE para a CRIAÇÃO
+            val dataRegistroFormatada: String
+            if (isUpdating) {
+                // Mantém a data de registro original ou a data que foi preenchida pelo formulário (se houver um campo de data editável)
+                dataRegistroFormatada = _artefatoEditavel.value?.data ?: data.value ?: SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+            } else {
+                // Novo registro: usa a data e hora atuais
+                dataRegistroFormatada = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+            }
 
             // 2. Criação/Atualização da Instância
             if (isUpdating) {
                 // --- MODO ATUALIZAÇÃO (UPDATE) ---
-                val artefatoExistente = _artefatoEditavel.value!! // Artefato carregado
+                val artefatoExistente = _artefatoEditavel.value!!
 
-                // Cria uma nova instância, mantendo IDs e coordenadas originais
+                // Cria uma nova instância, mantendo IDs e coordenadas originais (Quadra, X, Y)
                 artefatoFinal = artefatoExistente.copy(
-                    // CAMPOS ATUALIZADOS PELO FORMULÁRIO
+                    // CAMPOS GERAIS ATUALIZADOS PELO FORMULÁRIO
                     area = area.value!!,
-                    material = tipo.value!!,
-                    pesquisador = pesquisador.value!!,
+                    sondagem = sondagem.value ?: "N/A", // Permite alteração da sondagem
+                    pontoGPS = pontoGPS.value,
 
-                    // CAMPOS DE DATA/LOGÍSTICA QUE SÃO SEMPRE ATUALIZADOS
-                    data = dataRegistroFormatada,
-                    obs = null // Supondo que obs também é um campo do formulário
-                    // ... (aplicar todos os campos que podem ser editados)
+                    nivel = nivel.value.toString(),
+                    camada = camada.value ?: "I",
+                    decapagem = decapagem.value,
+
+                    material = material.value!!,
+                    quantidade = quantidade.value ?: 1,
+
+                    pesquisador = pesquisador.value ?: "N/A",
+                    obs = obs.value,
+                    fotoCaminho = fotoCaminho.value,
+
+                    // Mantém a data de registro original
+                    data = dataRegistroFormatada
                 )
 
             } else {
                 // --- MODO CRIAÇÃO (CREATE) ---
                 artefatoFinal = Artefato(
                     // Geração de IDs e Coordenadas
-                    idCartao = UUID.randomUUID().toString(),
-                    quadra = _initialQuadra.value!!,
+                    id = UUID.randomUUID().toString(),
+                    quadra = _initialQuadra.value!!, // Usa a quadra inicial fixada
                     xRelativo = _initialXRelativo.value!!,
                     yRelativo = _initialYRelativo.value!!,
-                    sondagem = _initialSondagem.value ?: "N/A", // Valor default seguro
-                    pontoGPS = null,
 
                     // Dados do Formulário
-                    area = area.value!!,
-                    material = tipo.value!!,
-                    pesquisador = pesquisador.value!!,
+                    area = area.value!!, // Deve ser igual a quadra no modo de criação, mas é um campo separado
+                    sondagem = sondagem.value ?: "N/A",
+                    pontoGPS = pontoGPS.value,
 
-                    // Dados Fixos/Default
-                    nivel = "01",
-                    camada = "I",
-                    decapagem = null,
-                    quantidade = 1,
+                    // Contexto Estratigráfico
+                    nivel = nivel.value.toString(),
+                    camada = camada.value ?: "I",
+                    decapagem = decapagem.value,
+
+                    // Detalhes do Achado
+                    material = material.value!!,
+                    quantidade = quantidade.value ?: 1,
 
                     // Logística
-                    data = dataRegistroFormatada,
-                    obs = null,
-                    fotoCaminho = null
+                    pesquisador = pesquisador.value ?: "N/A",
+                    data = dataRegistroFormatada, // Data formatada
+                    obs = obs.value,
+                    fotoCaminho = fotoCaminho.value
                 )
             }
 
@@ -141,12 +199,10 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
                 _saveSuccess.value = true
             } catch (e: Exception) {
                 _saveSuccess.value = false
+                // Logar o erro aqui
             } finally {
                 _isLoading.value = false
             }
         }
     }
-
-    // As funções vazias que estavam causando o erro foram removidas.
-    // A função 'updateExistingArtefato' foi incorporada à 'saveOrUpdateArtefato'.
 }

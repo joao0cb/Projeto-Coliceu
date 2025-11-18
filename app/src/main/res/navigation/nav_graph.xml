@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/MapArqueologicoFragment">
+
+    <fragment
+        android:id="@+id/MapArqueologicoFragment"
+        android:name="com.example.projetocoliceu.ui.map.MapaArqueologicoFragment"
+        android:label="Mapa" />
+
+    <fragment
+        android:id="@+id/ArtifactDetailFragment"
+        android:name="com.example.projetocoliceu.ui.artifact.ArtifactDetailFragment"
+        android:label="Cadastro" />
+    <action
+        android:id="@+id/action_MapArqueologicoFragment_to_ArtifactDetailFragment"
+        app:destination="@id/ArtifactDetailFragment" />
+</navigation>
