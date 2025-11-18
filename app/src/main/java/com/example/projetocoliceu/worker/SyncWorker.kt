@@ -3,12 +3,10 @@ package com.example.projetocoliceu.worker // Crie o pacote 'worker'
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import androidx.work.ListenableWorker.Result
+import com.example.projetocoliceu.data.api.RetrofitClient
 import com.example.projetocoliceu.data.repository.ArtefatoRepository // Importe o Repository
-import com.example.projetocoliceu.data.db.ColiceuDatabase
-// Você precisará de injeção de dependência real, mas vamos simular por enquanto.
+import com.example.projetocoliceu.data.db.AppDatabase
 
-private var SyncWorker.dao: Any
 
 // O construtor é obrigatório para o WorkManager
 class SyncWorker(
@@ -18,12 +16,15 @@ class SyncWorker(
 
     // Note: Você deve injetar o Repository aqui usando Hilt/Koin,
     // mas por simplicidade, vamos instanciá-lo (NÃO RECOMENDADO EM PRODUÇÃO):
-    private val repository = ArtefatoRepository(
-        // API Service e DAO precisam ser obtidos. Vamos assumir que você tem um DAO.
-        apiService = // Seu ArtifactApiService aqui
-            dao = ColiceuDatabase.getDatabase(appContext).artefatoDao(),
-        context = appContext
-    )
+    private val repository: ArtefatoRepository by lazy {
+        val dao = AppDatabase.getDatabase(appContext).artefatoDao()
+        // Passa os 3 parâmetros obrigatórios para o Repositório:
+        ArtefatoRepository(
+            apiService = RetrofitClient.apiService, // Usa a instância real da API
+            dao = dao,
+            context = appContext
+        )
+    }
 
     // O método principal que o Worker executa
     override suspend fun doWork(): Result {

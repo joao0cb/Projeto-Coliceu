@@ -7,6 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.activity.viewModels
 // Necessário para encontrar IDs de recursos (R.id.mapaArqueologicoView)
+import com.example.projetocoliceu.data.db.AppDatabase
 import com.example.projetocoliceu.data.api.RetrofitClient
 import com.example.projetocoliceu.data.repository.ArtefatoRepository
 import com.example.projetocoliceu.ui.map.MapaArqueologico
@@ -15,25 +16,32 @@ import com.example.projetocoliceu.viewmodel.MapViewModelFactory // IMPORT NECESS
 
 class MainActivity : AppCompatActivity() {
 
-    // 1. Inicializa o Repositório (ArtefatoRepository)
-    // O erro ArtefatoRepository(RetrofitClient.apiService) foi resolvido com os imports acima.
-    private val repository by lazy {
-        ArtefatoRepository(RetrofitClient.apiService)
+    // 1. Inicializa o Database (Room)
+    private val database by lazy {
+        AppDatabase.getDatabase(applicationContext)
     }
 
-    // 2. Inicializa o MapViewModel usando a Factory
-    // O erro MapViewModelFactory(repository) foi resolvido com o import acima.
+    // 2. Inicializa o Repositório, passando o DAO e o Context
+    private val repository by lazy {
+        ArtefatoRepository(
+            RetrofitClient.apiService,
+            database.artefatoDao(), // Agora o 'dao' está resolvido
+            applicationContext      // Agora o 'context' está resolvido
+        )
+    }
+
+    // 3. Inicializa o MapViewModel usando a Factory
     private val mapViewModel: MapViewModel by viewModels {
         MapViewModelFactory(repository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // ... (código onCreate omitido por brevidade)
 
-        // MANTIDO: Configuração de borda e set do layout
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        setContentView(R.layout.activity_map)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mapaArqueologico)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -41,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         // 3. Conexão do Mapa com a Activity
         // O ID 'mapaArqueologicoView' é o que está no seu activity_main.xml
-        val mapaView: MapaArqueologico = findViewById(R.id.mapaArqueologicoView)
+        val mapaView: MapaArqueologico = findViewById(R.id.mapa)
 
         // 4. Injetar o ViewModel no Mapa
         mapaView.setViewModel(mapViewModel)

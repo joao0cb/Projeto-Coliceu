@@ -1,7 +1,6 @@
 package com.example.projetocoliceu.data.repository
 
 import android.content.Context
-// 🛠️ Importações WorkManager (Corrigindo "Unresolved reference 'Builder'")
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
@@ -12,6 +11,8 @@ import com.example.projetocoliceu.data.model.toArtefatoEntity
 import com.example.projetocoliceu.data.model.Artefato
 import com.example.projetocoliceu.data.db.ArtefatoDao
 import com.example.projetocoliceu.data.api.ArtifactApiService
+import com.example.projetocoliceu.data.db.ArtefatoEntity
+import com.example.projetocoliceu.worker.SyncWorker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -63,9 +64,6 @@ class ArtefatoRepository(
         }
     }
 
-    // -------------------------------------------------------------------------
-    // MÉTODOS REMOTOS (Usados APENAS pelo SyncWorker para PUSH/PULL)
-    // -------------------------------------------------------------------------
 
     suspend fun fetchAllArtifactsRemote(): List<Artefato> {
         // 🛠️ CORREÇÃO: Mapeando ArtefatoEntity para Artefato após a chamada da API
