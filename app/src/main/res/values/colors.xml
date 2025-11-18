@@ -4,5 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primaryColor">#8d2421</color>
     <color name="selectColor">#f3bd54</color>
-
+    <color name="secondColor">#f9f1da</color>
+    <color name="fontColor">#82411d</color>
 </resources>
