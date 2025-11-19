@@ -37,15 +37,21 @@ class CadastroUsuarioFragment : Fragment() {
             val email = etEmail.text.toString()
             val senha = etSenha.text.toString()
 
+            if (nome.isBlank() || email.isBlank() || senha.isBlank()) {
+                Toast.makeText(context, "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             viewModel.cadastrarUsuario(nome, email, senha)
         }
+
 
         // 2. Observar Sucesso
         viewModel.cadastroSucesso.observe(viewLifecycleOwner) { sucesso ->
             if (sucesso) {
                 Toast.makeText(context, "Usuário criado com sucesso!", Toast.LENGTH_SHORT).show()
                 // Navegar para a tela de Login ou Mapa
-                // findNavController().navigate(R.id.action_cadastro_to_login)
+                findNavController().navigate(R.id.action_cadastro_to_login)
             }
         }
 

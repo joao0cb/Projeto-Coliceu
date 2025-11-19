@@ -17,4 +17,9 @@
     <action
         android:id="@+id/action_MapArqueologicoFragment_to_ArtifactDetailFragment"
         app:destination="@id/ArtifactDetailFragment" />
+    <fragment
+        android:id="@+id/cadastroUsuarioFragment"
+        android:name="com.example.projetocoliceu.ui.auth.CadastroUsuarioFragment"
+        android:label="fragment_cadastro"
+        tools:layout="@layout/fragment_cadastro" />
 </navigation>

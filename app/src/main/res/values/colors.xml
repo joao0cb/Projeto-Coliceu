@@ -6,4 +6,5 @@
     <color name="selectColor">#f3bd54</color>
     <color name="secondColor">#f9f1da</color>
     <color name="fontColor">#82411d</color>
+    <color name="hintColor">#808080</color>
 </resources>
