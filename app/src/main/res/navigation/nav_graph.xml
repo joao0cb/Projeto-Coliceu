@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/MapArqueologicoFragment">
+    app:startDestination="@id/homeFragment">
 
     <fragment
         android:id="@+id/MapArqueologicoFragment"
@@ -22,4 +22,9 @@
         android:name="com.example.projetocoliceu.ui.auth.CadastroUsuarioFragment"
         android:label="fragment_cadastro"
         tools:layout="@layout/fragment_cadastro" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.projetocoliceu.ui.home.HomeFragment"
+        android:label="Início"
+        tools:layout="@layout/fragment_home" />
 </navigation>
