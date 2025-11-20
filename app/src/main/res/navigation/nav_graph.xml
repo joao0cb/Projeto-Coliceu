@@ -27,4 +27,9 @@
         android:name="com.example.projetocoliceu.ui.home.HomeFragment"
         android:label="Início"
         tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.projetocoliceu.ui.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login" />
 </navigation>

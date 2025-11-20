@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradiente"
+    tools:context=".ui.auth.loginFragment">
+
+    <!-- TÍTULO LOGIN -->
+    <TextView
+        android:id="@+id/tvLoginTitulo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="LOGIN"
+        android:fontFamily="@font/passero_one"
+        android:textColor="@color/fontColor"
+        android:textSize="46sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="24dp"
+        android:shadowColor="#80000000"
+        android:shadowRadius="2.5"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="60dp" />
+
+    <!-- CARD -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cardLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rounded_card"
+        android:padding="24dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="62dp"
+        app:layout_constraintTop_toBottomOf="@id/tvLoginTitulo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- EMAIL -->
+        <EditText
+            android:id="@+id/etEmailLogin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="E-mail"
+            android:inputType="textEmailAddress"
+            android:background="@drawable/bg_edittext_rounded"
+            android:padding="12dp"
+            android:textColor="@color/fontColor"
+            android:textColorHint="@color/hintColor"
+            android:fontFamily="@font/passero_one"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- SENHA -->
+        <EditText
+            android:id="@+id/etSenhaLogin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Senha"
+            android:inputType="textPassword"
+            android:background="@drawable/bg_edittext_rounded"
+            android:padding="12dp"
+            android:textColor="@color/fontColor"
+            android:textColorHint="@color/hintColor"
+            android:fontFamily="@font/passero_one"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/etEmailLogin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- Lembrar-me e Recuperar senha -->
+        <LinearLayout
+            android:id="@+id/optionsRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:weightSum="2"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/etSenhaLogin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <CheckBox
+                android:id="@+id/checkLembrarMe"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Lembrar-me"
+                android:textColor="@color/fontColor"
+                android:fontFamily="@font/passero_one"/>
+
+            <TextView
+                android:id="@+id/tvRecuperarSenha"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="Recuperar senha"
+                android:textColor="@color/selectColor"
+                android:textStyle="bold"
+                android:fontFamily="@font/passero_one"/>
+        </LinearLayout>
+
+        <!-- Não tem cadastro? Cadastre-se -->
+        <TextView
+            android:id="@+id/tvIrParaCadastro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Não tem cadastro? Cadastre-se"
+            android:textColor="@color/fontColor"
+            android:fontFamily="@font/passero_one"
+            android:textSize="16sp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@id/optionsRow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- BOTÃO ENTRAR -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEntrar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:text="ENTRAR"
+        android:fontFamily="@font/passero_one"
+        android:textColor="@color/fontColor"
+        android:textSize="30sp"
+        app:backgroundTint="@color/selectColor"
+        app:cornerRadius="8dp"
+        android:elevation="8dp"
+        android:stateListAnimator="@null"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintTop_toBottomOf="@id/cardLogin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
