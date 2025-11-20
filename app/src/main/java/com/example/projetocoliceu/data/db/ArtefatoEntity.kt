@@ -1,6 +1,5 @@
 package com.example.projetocoliceu.data.db
 
-import com.example.projetocoliceu.data.model.Artefato
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID

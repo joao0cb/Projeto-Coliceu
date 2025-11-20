@@ -107,7 +107,35 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
     }
 
     // --- FUNÇÃO PRINCIPAL DE SALVAR/ATUALIZAR (CRUD: C e U) ---
+    // --- LISTA DE ARTEFATOS E CARREGAMENTO ---
+    private val _artifacts = MutableLiveData<List<Artefato>>()
+    val artifacts: LiveData<List<Artefato>> = _artifacts
 
+    fun fetchArtifacts() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                // Supondo que o Repositório tenha uma função para obter todos os artefatos
+                _artifacts.value = repository.getAllArtifacts() as List<Artefato>?
+            } catch (e: Exception) {
+                // Lógica de tratamento de erro
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+    // --- FUNÇÃO PARA DELETAR (CRUD: D) ---
+    fun deleteArtifact(artefato: Artefato) {
+        viewModelScope.launch {
+            try {
+                repository.deleteArtifact(artefato)
+                // Opcional: Recarrega a lista para atualizar a UI do mapa
+                fetchArtifacts()
+            } catch (e: Exception) {
+                // Tratar erro de exclusão
+            }
+        }
+    }
     fun saveOrUpdateArtifact() {
         // Validação: Verifique os campos essenciais
         if (material.value.isNullOrBlank() || area.value.isNullOrBlank() || nivel.value == null) {
