@@ -85,25 +85,41 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
     }
 
     // 2. Injeta um Artefato existente para edição
-    fun setArtifactToEdition(artefato: Artefato) {
+    fun setArtifactToEdition(artefato: Artefato?) {
         _artefatoEditavel.value = artefato
+        if (artefato == null) {
+            // Limpar campos para modo criação (mantém valores de initialQuadra/x/y)
+            area.value = _initialQuadra.value ?: ""
+            sondagem.value = _initialSondagem.value ?: ""
+            pontoGPS.value = null
+            nivel.value = 1
+            camada.value = "I"
+            decapagem.value = null
+            material.value = ""
+            quantidade.value = 1
+            pesquisador.value = null
+            data.value = null
+            obs.value = null
+            fotoCaminho.value = null
+        } else {
+            // Preenche com dados do artefato (sua implementação já tinha isso; pode reutilizar)
+            area.value = artefato.area
+            sondagem.value = artefato.sondagem
+            pontoGPS.value = artefato.pontoGPS
+            nivel.value = artefato.nivel.toIntOrNull()
+            camada.value = artefato.camada
+            decapagem.value = artefato.decapagem
+            material.value = artefato.material
+            quantidade.value = artefato.quantidade
+            pesquisador.value = artefato.pesquisador
+            data.value = artefato.data
+            obs.value = artefato.obs
+            fotoCaminho.value = artefato.fotoCaminho
+        }
+    }
 
-        // Preenche os LiveDatas do formulário com os dados do artefato existente
-        area.value = artefato.area
-        sondagem.value = artefato.sondagem
-        pontoGPS.value = artefato.pontoGPS
-
-        nivel.value = artefato.nivel.toIntOrNull() // Converte String para Int
-        camada.value = artefato.camada
-        decapagem.value = artefato.decapagem
-
-        material.value = artefato.material
-        quantidade.value = artefato.quantidade
-
-        pesquisador.value = artefato.pesquisador
-        data.value = artefato.data
-        obs.value = artefato.obs
-        fotoCaminho.value = artefato.fotoCaminho
+    fun clearEditionIfNeeded() {
+        _artefatoEditavel.value = null
     }
 
     // --- FUNÇÃO PRINCIPAL DE SALVAR/ATUALIZAR (CRUD: C e U) ---

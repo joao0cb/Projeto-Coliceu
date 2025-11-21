@@ -4,24 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.example.projetocoliceu.R
-import com.example.projetocoliceu.data.model.Artefato
+import com.example.projetocoliceu.databinding.FragmentArtifactBinding
 import com.example.projetocoliceu.viewmodel.ArtifactViewModel
 import com.google.android.material.textfield.TextInputEditText
-import java.util.Locale
 
-// Assumindo que este Fragment usa o layout "ScrollView" fornecido anteriormente.
 class ArtifactDetailFragment : Fragment() {
 
-    // Acesso ao ViewModel Compartilhado (escopo da Activity)
     private val viewModel: ArtifactViewModel by activityViewModels()
+    private var _binding: FragmentArtifactBinding? = null
+    private val binding get() = _binding!!
 
-    // Referências a TODOS os campos de entrada do layout (et_*)
+    // campos
     private lateinit var etArea: TextInputEditText
     private lateinit var etSondagem: TextInputEditText
     private lateinit var etGps: TextInputEditText
@@ -36,82 +33,86 @@ class ArtifactDetailFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Assume-se que R.layout.fragment_register_artifact é o seu layout de formulário (ScrollView)
-        val view = inflater.inflate(R.layout.fragment_register_artifact, container, false)
+        savedInstanceState: Bundle?,
+    ): View {
+        _binding = FragmentArtifactBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        // 2. Inicializa as referências dos campos do formulário (Usando IDs Corretos)
-        etArea = view.findViewById(R.id.et_area)
-        etSondagem = view.findViewById(R.id.et_sondagem)
-        etGps = view.findViewById(R.id.et_gps)
-        etNivel = view.findViewById(R.id.et_nivel)
-        etCamada = view.findViewById(R.id.et_camada)
-        etDecapagem = view.findViewById(R.id.et_decapagem)
-        etMaterial = view.findViewById(R.id.et_material)
-        etQuantidade = view.findViewById(R.id.et_quantidade)
-        etData = view.findViewById(R.id.et_data)
-        etPesquisador = view.findViewById(R.id.et_pesquisador)
-        etObs = view.findViewById(R.id.et_obs)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // Inicializa campos a partir do binding
+        etArea = binding.etArea
+        etSondagem = binding.etSondagem
+        etGps = binding.etGps
+        etNivel = binding.etNivel
+        etCamada = binding.etCamada
+        etDecapagem = binding.etDecapagem
+        etMaterial = binding.etMaterial
+        etQuantidade = binding.etQuantidade
+        etData = binding.etData
+        etPesquisador = binding.etPesquisador
+        etObs = binding.etObs
 
-        val btnSalvar = view.findViewById<Button>(R.id.btn_salvar)
-        val tvQuadraInfo = view.findViewById<TextView>(R.id.tv_quadra_info)
+        val btnSalvar = binding.btnAdicionar
+        val btnDeletar = binding.btnDeletar
+        val tvQuadraInfo = binding.tvQuadraInfo
 
-        // 3. Preencher a interface e os LiveDatas do formulário
+        // Observadores para preencher UI
         setupFormObservers(tvQuadraInfo)
 
-        // 4. Configurar o botão Salvar
+        // Salvar/Atualizar
         btnSalvar.setOnClickListener {
-            // 🚨 Etapa Crítica: Transferir os dados da View (EditText) para o ViewModel (LiveData)
             transferFormToViewModel()
-
             viewModel.saveOrUpdateArtifact()
         }
 
-        // 5. Observar o sucesso do salvamento para fechar a tela
-        viewModel.saveSuccess.observe(viewLifecycleOwner) { isSuccess ->
-            if (isSuccess == true) { // Use '== true' para tratar o Boolean? de LiveData
-                // Navega de volta, assumindo que este fragmento foi aberto a partir do mapa
+        // Deletar
+        btnDeletar.setOnClickListener {
+            // Somente se estivermos em modo edição
+            val atual = viewModel.artefatoEditavel.value
+            if (atual != null) {
+                viewModel.deleteArtifact(atual)
+                // Após deletar, volta ao mapa
+                findNavController().popBackStack()
+            } else {
+                // Se não há artefato editável (modo criação), apenas volta
                 findNavController().popBackStack()
             }
         }
 
-        return view
+        // Observa sucesso do salvamento e fecha
+        viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
+            if (success == true) {
+                // limpa edição atual para evitar reaproveitamento indevido
+                viewModel.clearEditionIfNeeded()
+                findNavController().popBackStack()
+            }
+        }
     }
 
-    /**
-     * Observa LiveDatas do ViewModel para preencher a UI.
-     */
     private fun setupFormObservers(tvQuadraInfo: TextView) {
-
-        // Exibe as coordenadas iniciais fixadas
         viewModel.initialQuadra.observe(viewLifecycleOwner) { quadra ->
             val x = viewModel.initialXRelativo.value ?: 0f
             val y = viewModel.initialYRelativo.value ?: 0f
             val sondagem = viewModel.initialSondagem.value ?: "N/A"
+            tvQuadraInfo.text = "Quadra: $quadra, Sondagem: $sondagem (x=${"%.2f".format(x)}, y=${"%.2f".format(y)})"
 
-            // Atualiza o TextView informativo no topo
-            val quadraInfo = "Quadra: $quadra, Sondagem: $sondagem (x=${"%.2f".format(x)}, y=${"%.2f".format(y)})"
-            tvQuadraInfo.text = quadraInfo
+            // Se modo criação preenche area com quadra
+            if (viewModel.artefatoEditavel.value == null) {
+                etArea.setText(quadra)
+            }
         }
 
-        // Observa o artefato de edição para pré-preencher todos os campos
         viewModel.artefatoEditavel.observe(viewLifecycleOwner) { artefato ->
             artefato?.let {
-                // Preenche campos de Localização/Contexto
                 etArea.setText(it.area)
                 etSondagem.setText(it.sondagem)
                 etGps.setText(it.pontoGPS)
-
-                etNivel.setText(it.nivel) // Nível no VM é Int, no model é String. Precisa ser String aqui.
+                etNivel.setText(it.nivel)
                 etCamada.setText(it.camada)
                 etDecapagem.setText(it.decapagem)
-
-                // Preenche Detalhes
                 etMaterial.setText(it.material)
                 etQuantidade.setText(it.quantidade.toString())
-
-                // Preenche Logística
                 etData.setText(it.data)
                 etPesquisador.setText(it.pesquisador)
                 etObs.setText(it.obs)
@@ -119,30 +120,25 @@ class ArtifactDetailFragment : Fragment() {
         }
     }
 
-    /**
-     * Transfere o valor atual dos campos de texto (EditText) para os LiveDatas do ViewModel,
-     * garantindo que o ViewModel tenha os dados mais recentes antes de salvar.
-     */
     private fun transferFormToViewModel() {
-        // Coordenadas/Localização
-        viewModel.area.value = etArea.text.toString()
-        viewModel.sondagem.value = etSondagem.text.toString()
-        viewModel.pontoGPS.value = etGps.text.toString().takeIf { it.isNotBlank() } // Envia null se vazio
+        viewModel.area.value = etArea.text?.toString() ?: ""
+        viewModel.sondagem.value = etSondagem.text?.toString() ?: ""
+        viewModel.pontoGPS.value = etGps.text?.toString()?.takeIf { it.isNotBlank() }
 
-        // Contexto Estratigráfico
-        viewModel.nivel.value = etNivel.text.toString().toIntOrNull()
-        viewModel.camada.value = etCamada.text.toString()
-        viewModel.decapagem.value = etDecapagem.text.toString().takeIf { it.isNotBlank() }
+        viewModel.nivel.value = etNivel.text?.toString()?.toIntOrNull()
+        viewModel.camada.value = etCamada.text?.toString() ?: ""
+        viewModel.decapagem.value = etDecapagem.text?.toString()?.takeIf { it.isNotBlank() }
 
-        // Detalhes do Achado
-        viewModel.material.value = etMaterial.text.toString()
-        viewModel.quantidade.value = etQuantidade.text.toString().toIntOrNull()
+        viewModel.material.value = etMaterial.text?.toString() ?: ""
+        viewModel.quantidade.value = etQuantidade.text?.toString()?.toIntOrNull() ?: 1
 
-        // Logística e Observações
-        viewModel.data.value = etData.text.toString().takeIf { it.isNotBlank() }
-        viewModel.pesquisador.value = etPesquisador.text.toString().takeIf { it.isNotBlank() }
-        viewModel.obs.value = etObs.text.toString().takeIf { it.isNotBlank() }
+        viewModel.data.value = etData.text?.toString()?.takeIf { it.isNotBlank() }
+        viewModel.pesquisador.value = etPesquisador.text?.toString()?.takeIf { it.isNotBlank() }
+        viewModel.obs.value = etObs.text?.toString()?.takeIf { it.isNotBlank() }
+    }
 
-        // Não estamos mexendo com fotoCaminho, pois isso viria de uma ação da câmera (btn_foto)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -1,6 +1,5 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mapaArqueologico"
     android:background="@drawable/bg_gradiente"
     android:layout_width="match_parent"
@@ -28,7 +27,7 @@
         app:menu="@menu/bottom_nav_menu" />
 
     <com.example.projetocoliceu.ui.map.MapaArqueologico
-        android:id="@+id/mapa"
+        android:id="@+id/map"
         android:layout_width="1278dp"
         android:layout_height="524dp"
 
@@ -40,7 +39,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/logo"
         android:layout_width="88dp"
         android:layout_height="87dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -51,12 +50,11 @@
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/logo" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+    <FrameLayout
+        android:id="@+id/frame"
         android:layout_width="409dp"
         android:layout_height="75dp"
         android:layout_marginTop="104dp"
-        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -64,53 +62,26 @@
             android:id="@+id/btn_adicionar"
             android:layout_width="137dp"
             android:layout_height="56dp"
-            android:layout_marginStart="100dp"
+            android:layout_marginStart="244dp"
             android:layout_marginTop="8dp"
-            android:fontFamily="@font/passero_one"
             android:text="Adicionar"
-            android:textColor="@color/fontColor"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:backgroundTint="@color/selectColor"
-            android:elevation="8dp"
-            app:cornerRadius="4dp"
-            android:stateListAnimator="@null"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            style="@style/ButtonStyle"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_listar"
-            android:layout_width="137dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="256dp"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/passero_one"
-            android:text="Listar"
-            android:textColor="@color/fontColor"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:backgroundTint="@color/selectColor"
-            app:cornerRadius="4dp"
-            android:elevation="8dp"
-            android:stateListAnimator="@null"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
     <FrameLayout
-        android:id="@+id/frameLayout2"
+        android:id="@+id/titleContent"
         android:layout_width="528dp"
         android:layout_height="32dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="128dp"
-        app:layout_constraintEnd_toStartOf="@+id/constraintLayout"
+        app:layout_constraintEnd_toStartOf="@+id/frame"
         app:layout_constraintHorizontal_bias="0.346"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textMain"
             android:layout_width="502dp"
             android:layout_height="34dp"
             android:fontFamily="@font/passero_one"
@@ -122,7 +93,7 @@
     </FrameLayout>
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/bussola"
         android:layout_width="81dp"
         android:layout_height="76dp"
         android:layout_marginStart="36dp"
@@ -130,5 +101,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/bussola" />
+    <!-- Opcional: botão para criar artefato por outro fluxo -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

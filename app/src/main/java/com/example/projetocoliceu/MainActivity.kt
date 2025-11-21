@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         // ... (código onCreate omitido por brevidade)
 
         enableEdgeToEdge()
-        setContentView(R.layout.activity_map)
+        setContentView(R.layout.fragment_map)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mapaArqueologico)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         // 3. Conexão do Mapa com a Activity
         // O ID 'mapaArqueologicoView' é o que está no seu activity_main.xml
-        val mapaView: MapaArqueologico = findViewById(R.id.mapa)
+        val mapaView: MapaArqueologico = findViewById(R.id.map)
 
         // 4. Injetar o ViewModel no Mapa
         mapaView.setViewModel(mapViewModel)

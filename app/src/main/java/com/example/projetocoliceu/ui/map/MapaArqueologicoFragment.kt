@@ -8,104 +8,70 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.projetocoliceu.R
-import com.example.projetocoliceu.databinding.ActivityMapBinding
+import com.example.projetocoliceu.data.model.Artefato
+import com.example.projetocoliceu.databinding.FragmentMapBinding
 import com.example.projetocoliceu.viewmodel.ArtifactViewModel
+import com.example.projetocoliceu.viewmodel.MapViewModel
 
-class MapaArqueologicoFragment : Fragment(R.layout.activity_map) {
+class MapaArqueologicoFragment : Fragment() {
 
-    private var _binding: ActivityMapBinding? = null
+    private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
 
-    // ViewModel compartilhado entre Fragments
-    private val viewModel: ArtifactViewModel by activityViewModels()
+    // Se usa um MapViewModel separado (opcional). Mas necessário: ArtifactViewModel para compartilhar dados de edição.
+    private val artifactViewModel: ArtifactViewModel by activityViewModels()
+    private val mapViewModel: MapViewModel by activityViewModels() // ou viewModels() conforme injeção
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = ActivityMapBinding.inflate(inflater, container, false)
+        _binding = FragmentMapBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.fetchArtifacts()
-            // 3. Inicialização e Observação
-            setupObservers()
-            setupMapInteractions()
+        // Configura o custom view e observa dados
+        val customMap = binding.map
 
-            // Inicia o carregamento dos artefatos
-            viewModel.fetchArtifacts()
+        // Injeta o viewmodel no custom view (opcional, seu custom view tem setViewModel)
+        customMap.setViewModel(mapViewModel)
+
+        // Observa a lista de artefatos do MapViewModel e passa para o custom view
+        mapViewModel.artefatos.observe(viewLifecycleOwner) { lista ->
+            customMap.setArtefatos(lista)
         }
 
-    private fun setupObservers() {
-        // Observa a lista de artefatos para desenhar no mapa
-        viewModel.artifacts.observe(viewLifecycleOwner) { lista ->
-            // A função 'setArtefatos' deve ser implementada na sua Custom View 'mapaArqueologico'
-            binding.mapaArqueologico.setArtefatos(lista)
+        // Callback: quando o custom view detecta clique em artefato
+        customMap.onArtefatoClick = { artefato ->
+            // Injeta o artefato no ArtifactViewModel para edição
+            artifactViewModel.setArtifactToEdition(artefato)
+
+            // Opcional: também setar coordenadas iniciais para o formulário (se desejar)
+            artifactViewModel.setInitialCoordinates(artefato.quadra, artefato.xRelativo, artefato.yRelativo, artefato.sondagem)
+
+            // Navega para o fragmento de detalhe (usando nav component)
+            findNavController().navigate(R.id.action_MapArqueologicoFragment_to_ArtifactDetailFragment)
         }
 
-        // Opcional: Observa o estado de carregamento se houver um Spinner/ProgressBar
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            // binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-        }
-    }
-
-    /**
-     * Configura os listeners de interação do mapa (cliques nos pontos).
-     */
-    private fun setupMapInteractions() {
-        // 4. Clique no Artefato (Ponto no Mapa) → Abre BottomSheet
-        binding.mapaArqueologico.onArtefatoClick = { artefato ->
-
-            // Crie uma instância da sua BottomSheet (classe não fornecida, assumida)
-            ArtefatoOpcoesBottomSheet(
-                artefato,
-
-                // Ação de Editar
-                onEditar = { a ->
-                    // 4a. Injeta o artefato no ViewModel (modo edição)
-                    viewModel.setArtifactToEdition(a)
-
-                    // 4b. Navega para a tela de edição
-                    findNavController().navigate(
-                        R.id.action_MapArqueologicoFragment_to_ArtifactDetailFragment
-                    )
-                },
-
-                // Ação de Excluir
-                onExcluir = { a ->
-                    // 4c. Chama a função de exclusão no ViewModel
-                    viewModel.deleteArtifact(a)
-                    Toast.makeText(requireContext(),
-                        getString(R.string.artifact_deleted, a.id),
-                        Toast.LENGTH_SHORT).show()
-                }
-            ).show(parentFragmentManager, "OpcoesArtefato")
+        // Botão fab para criar novo artefato via MapViewModel (se desejar)
+        binding.btnAdicionar.setOnClickListener {
+            // Aqui você pode abrir modo criação - por exemplo posicionamento manual ou padrão
+            // Exemplo simples: cria artefato vazio com quadra A1 e cai no formulário
+            mapViewModel.startNewArtefato("A1", 0.5f, 0.5f)
         }
 
-        // Opcional: Adicionar listener para criar um novo artefato (clique longo ou botão)
-        binding.mapaArqueologico.onMapLongPress = { quadra, x, y ->
-            // 5. Inicia o fluxo de criação
-            handleNewArtifactCreation(quadra, x, y)
+        // Observa evento de navegação para criação nova a partir do MapViewModel
+        mapViewModel.navigationEvent.observe(viewLifecycleOwner) { novoArtefato ->
+            novoArtefato?.let {
+                // Seta no ArtifactViewModel (modo criação)
+                artifactViewModel.setInitialCoordinates(it.quadra, it.xRelativo, it.yRelativo, it.sondagem)
+                // Garante que artefato editável seja null para forçar modo criação
+                // (nosso ArtifactViewModel já trata: se _artefatoEditavel == null -> criação)
+                artifactViewModel.setArtifactToEdition(null as? Artefato) // assegura null
+                findNavController().navigate(R.id.action_MapArqueologicoFragment_to_ArtifactDetailFragment)
+            }
         }
-    }
-
-    /**
-     * Prepara o ViewModel para a criação de um novo artefato e navega.
-     */
-    private fun handleNewArtifactCreation(quadra: String, x: Float, y: Float) {
-        // 1. Limpa o estado de edição (se houver)
-        viewModel.clearEditionState() // É importante adicionar esta função ao ViewModel
-
-        // 2. Injeta as coordenadas iniciais
-        viewModel.setInitialCoordinates(quadra, x, y)
-
-        // 3. Navega para a tela de detalhes/formulário
-        findNavController().navigate(
-            R.id.action_MapArqueologicoFragment_to_ArtifactDetailFragment
-        )
     }
 
     override fun onDestroyView() {

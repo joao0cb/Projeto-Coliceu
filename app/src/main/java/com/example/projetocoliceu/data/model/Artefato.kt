@@ -1,12 +1,9 @@
 package com.example.projetocoliceu.data.model
-
-import jakarta.persistence.*
+import androidx.room.Entity
 import com.example.projetocoliceu.data.db.ArtefatoEntity
 import java.util.UUID
 
-
-@Entity
-@Table(name = "artefatos")
+@Entity("artefatos")
 data class Artefato(
     // 1. Identificação Espacial (Para o mapa e localização)
     val id: String = UUID.randomUUID().toString(),

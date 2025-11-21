@@ -7,13 +7,15 @@
     <fragment
         android:id="@+id/MapArqueologicoFragment"
         android:name="com.example.projetocoliceu.ui.map.MapaArqueologicoFragment"
-        android:label="Mapa" />
+        android:label="Map">
+        <action
+            android:id="@+id/action_MapArqueologicoFragment_to_ArtifactDetailFragment"
+            app:destination="@id/ArtifactDetailFragment" />
+     </fragment>
 
     <fragment
         android:id="@+id/ArtifactDetailFragment"
         android:name="com.example.projetocoliceu.ui.artifact.ArtifactDetailFragment"
-        android:label="Cadastro" />
-    <action
-        android:id="@+id/action_MapArqueologicoFragment_to_ArtifactDetailFragment"
-        app:destination="@id/ArtifactDetailFragment" />
+        android:label="Detalhe Artefato" />
+
 </navigation>
