@@ -28,8 +28,8 @@
 
     <com.example.projetocoliceu.ui.map.MapaArqueologico
         android:id="@+id/map"
-        android:layout_width="1278dp"
-        android:layout_height="524dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
 
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_bar"
         app:layout_constraintEnd_toEndOf="parent"

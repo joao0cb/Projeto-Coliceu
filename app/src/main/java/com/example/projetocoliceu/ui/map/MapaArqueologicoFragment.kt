@@ -68,7 +68,7 @@ class MapaArqueologicoFragment : Fragment() {
                 artifactViewModel.setInitialCoordinates(it.quadra, it.xRelativo, it.yRelativo, it.sondagem)
                 // Garante que artefato editável seja null para forçar modo criação
                 // (nosso ArtifactViewModel já trata: se _artefatoEditavel == null -> criação)
-                artifactViewModel.setArtifactToEdition(null as? Artefato) // assegura null
+                artifactViewModel.setArtifactToEdition(null)
                 findNavController().navigate(R.id.action_MapArqueologicoFragment_to_ArtifactDetailFragment)
             }
         }
