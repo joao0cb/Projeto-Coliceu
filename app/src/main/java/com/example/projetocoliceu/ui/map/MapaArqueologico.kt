@@ -19,6 +19,7 @@ class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, a
     // Callback de clique no artefato dentro do CustomView
     var onArtefatoClick: ((Artefato) -> Unit)? = null
 
+    var onNovoArtefatoClick: ((String, Float, Float) -> Unit)? = null
     // Dados que serão desenhados (observados do ViewModel)
     private var artefatos: List<Artefato> = emptyList()
 
@@ -83,13 +84,23 @@ class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, a
             val y = j * quadraPixelAltura
             canvas.drawLine(0f, y, width.toFloat(), y, gridPaint)
         }
+
+        // Adiciona rótulos das quadras (A1, A2, ..., B1, B2, ...)
+        for (col in 0 until NUM_COLUNAS) {
+            for (row in 0 until NUM_LINHAS) {
+                val quadraLabel = "${'A' + col}${row + 1}"
+                val textX = col * quadraPixelLargura + 5f   // pequeno padding
+                val textY = row * quadraPixelAltura + 30f  // pequeno padding
+                canvas.drawText(quadraLabel, textX, textY, textPaint)
+            }
+        }
     }
 
     private fun drawArtefatos(canvas: Canvas, quadraPixelLargura: Float, quadraPixelAltura: Float) {
         artefatos.forEach { artefato ->
             // Simulação de cálculo de índice da quadra (a partir do nome da quadra no Artefato)
             val colunaIndex = artefato.quadra.firstOrNull()?.let { it.uppercaseChar() - 'A' } ?: 0
-            val linhaIndex = artefato.quadra.substring(1).toIntOrNull()?.minus(1) ?: 0
+            val linhaIndex = artefato.quadra.drop(1).toIntOrNull()?.minus(1) ?: 0
 
             // Posição de início da quadra em pixels
             val quadraInicioX = colunaIndex * quadraPixelLargura
@@ -117,9 +128,8 @@ class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, a
             val quadraPixelLargura = width.toFloat() / NUM_COLUNAS
             val quadraPixelAltura = height.toFloat() / NUM_LINHAS
 
-            // NOVO: 1. Verificar se o toque foi em um artefato existente
+            // 1. Verificar clique em artefato existente
             val artefatoClicado = artefatos.firstOrNull { artefato ->
-                // Lógica de mapeamento de volta para a posição do marcador (copiado do drawArtefatos)
                 val colunaIndex = artefato.quadra.firstOrNull()?.let { it.uppercaseChar() - 'A' } ?: 0
                 val linhaIndex = artefato.quadra.substring(1).toIntOrNull()?.minus(1) ?: 0
                 val quadraInicioX = colunaIndex * quadraPixelLargura
@@ -127,42 +137,31 @@ class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, a
                 val artefatoPixelX = quadraInicioX + (artefato.xRelativo * quadraPixelLargura)
                 val artefatoPixelY = quadraInicioY + (artefato.yRelativo * quadraPixelAltura)
 
-                // Simples verificação de raio (15f é o raio usado para desenhar)
                 val distanciaX = touchX - artefatoPixelX
                 val distanciaY = touchY - artefatoPixelY
-                val raioQuadrado = 15f * 15f // Raio para a área de clique
+                val raioQuadrado = 15f * 15f
                 (distanciaX * distanciaX + distanciaY * distanciaY) < raioQuadrado
             }
 
             if (artefatoClicado != null) {
-                // Se um artefato foi clicado, chama o callback e encerra o evento
                 onArtefatoClick?.invoke(artefatoClicado)
                 return true
             }
 
-            // 2. Se nenhum artefato foi clicado, continua com a lógica de "novo artefato"
-            // ... (o restante da sua lógica original para criar um novo artefato)
-
-            // 1. Descobrir em qual quadra o toque ocorreu
+            // 2. Criar novo artefato via toque no mapa
             val colunaIndex = (touchX / quadraPixelLargura).toInt()
             val linhaIndex = (touchY / quadraPixelAltura).toInt()
 
-            // 2. Calcular a posição relativa X e Y (0.0 a 1.0) dentro da quadra
             val xOffset = touchX - (colunaIndex * quadraPixelLargura)
             val yOffset = touchY - (linhaIndex * quadraPixelAltura)
 
             val xRelativo = xOffset / quadraPixelLargura
             val yRelativo = yOffset / quadraPixelAltura
 
-            // 3. Simulação de Nome da Quadra (Ex: A1, B2)
             val nomeQuadra = "${('A' + colunaIndex)}${linhaIndex + 1}"
 
-            // 4. Chamar a função do ViewModel para iniciar o formulário
-            if (::viewModel.isInitialized) {
-                // O ViewModel registra o toque e inicia a navegação para o formulário
-                viewModel.startNewArtefato(nomeQuadra, xRelativo, yRelativo)
-            }
-
+            // Chama o callback de criação
+            onNovoArtefatoClick?.invoke(nomeQuadra, xRelativo, yRelativo)
 
             return true
         }

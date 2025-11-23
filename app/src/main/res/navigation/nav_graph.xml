@@ -2,20 +2,24 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/MapArqueologicoFragment">
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/MapaArqueologicoFragment">
 
     <fragment
-        android:id="@+id/MapArqueologicoFragment"
+        android:id="@+id/MapaArqueologicoFragment"
         android:name="com.example.projetocoliceu.ui.map.MapaArqueologicoFragment"
-        android:label="Map">
+        android:label="Map"
+        tools:layout="@layout/fragment_map">
+
         <action
-            android:id="@+id/action_MapArqueologicoFragment_to_ArtifactDetailFragment"
+            android:id="@+id/action_MapaArqueologicoFragment_to_ArtifactDetailFragment"
             app:destination="@id/ArtifactDetailFragment" />
-     </fragment>
+    </fragment>
 
     <fragment
         android:id="@+id/ArtifactDetailFragment"
         android:name="com.example.projetocoliceu.ui.artifact.ArtifactDetailFragment"
-        android:label="Detalhe Artefato" />
+        android:label="Detalhe Artefato"
+        tools:layout="@layout/fragment_artifact" />
 
 </navigation>

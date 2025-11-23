@@ -36,7 +36,7 @@ data class ArtefatoEntity(
     val yRelativo: Float,
     val fotoCaminho: String?,
 
-    val syncStatus: Int
+    val syncStatus: Int = 0
 
 )
 

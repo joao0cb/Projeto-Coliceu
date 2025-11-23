@@ -1,106 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mapaArqueologico"
-    android:background="@drawable/bg_gradiente"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradiente"
+    tools:context=".ui.map.MapaArqueologicoFragment">
 
+    <!-- ======================= APP BAR FIXA NO TOPO (com logo central) ======================= -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/app_bar_top"
-        android:layout_width="1285dp"
-        android:layout_height="83dp"
+        android:layout_width="411dp"
+        android:layout_height="71dp"
         android:background="@color/primaryColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/top_app_bar_menu" />
+        app:menu="@menu/top_app_bar_menu">
 
+        <!-- Logo central dentro da Toolbar -->
+        <ImageView
+            android:id="@+id/toolbar_logo"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/logo" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- ============ LINHA FIXA: BUSSOLA + TEXTO + BOTÃO ADICIONAR ============ -->
+    <LinearLayout
+        android:id="@+id/top_info_row"
+        android:layout_width="383dp"
+        android:layout_height="64dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/app_bar_top">
+
+        <!-- Ícone da bússola -->
+        <ImageView
+            android:id="@+id/bussola"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/bussola" />
+
+        <!-- Texto principal -->
+
+        <!-- Botão Adicionar -->
+
+        <TextView
+            android:id="@+id/textMain"
+            android:layout_width="197dp"
+            android:layout_height="27dp"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/passero_one"
+            android:shadowColor="#80000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2.5"
+            android:text="Adicione ou Liste os cartões de identificação"
+            android:textColor="@color/fontColor"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- ======================= MAPA SCROLLÁVEL ======================= -->
+    <ScrollView
+        android:id="@+id/scroll_mapa"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/top_info_row"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="null">
+
+        <!-- Sua custom view do mapa dentro do ScrollView -->
+        <com.example.projetocoliceu.ui.map.MapaArqueologico
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white" />
+    </ScrollView>
+
+    <!-- ======================= BOTTOM NAVIGATION FIXA NO FUNDO ======================= -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_gradiente_nav"
         app:itemIconTint="@drawable/bottom_nav_icon_color"
+        app:menu="@menu/bottom_nav_menu"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
-
-    <com.example.projetocoliceu.ui.map.MapaArqueologico
-        android:id="@+id/map"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/app_bar_top"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="88dp"
-        android:layout_height="87dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.509"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/logo" />
-
-    <FrameLayout
-        android:id="@+id/frame"
-        android:layout_width="409dp"
-        android:layout_height="75dp"
-        android:layout_marginTop="104dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_adicionar"
-            android:layout_width="137dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="244dp"
-            android:layout_marginTop="8dp"
-            android:text="Adicionar"
-            style="@style/ButtonStyle"/>
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:id="@+id/titleContent"
-        android:layout_width="528dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="128dp"
-        app:layout_constraintEnd_toStartOf="@+id/frame"
-        app:layout_constraintHorizontal_bias="0.346"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/textMain"
-            android:layout_width="502dp"
-            android:layout_height="34dp"
-            android:fontFamily="@font/passero_one"
-            android:text="Adicione ou Liste os cartões de identificação"
-            android:shadowColor="#80000000"  android:shadowRadius="2.5"      android:shadowDx="1"          android:shadowDy="1"
-            android:textColor="@color/fontColor"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-    </FrameLayout>
-
-    <ImageView
-        android:id="@+id/bussola"
-        android:layout_width="81dp"
-        android:layout_height="76dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="100dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/bussola" />
-    <!-- Opcional: botão para criar artefato por outro fluxo -->
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

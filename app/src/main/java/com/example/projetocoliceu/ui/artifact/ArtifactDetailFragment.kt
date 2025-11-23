@@ -5,21 +5,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.example.projetocoliceu.data.api.RetrofitClient
+import com.example.projetocoliceu.data.db.AppDatabase
+import com.example.projetocoliceu.data.repository.ArtefatoRepository
 import com.example.projetocoliceu.databinding.FragmentArtifactBinding
 import com.example.projetocoliceu.viewmodel.ArtifactViewModel
+import com.example.projetocoliceu.viewmodel.ArtifactViewModelFactory
 import com.google.android.material.textfield.TextInputEditText
 
 class ArtifactDetailFragment : Fragment() {
 
-    private val viewModel: ArtifactViewModel by activityViewModels()
+    private val viewModel: ArtifactViewModel by activityViewModels {
+        ArtifactViewModelFactory(
+            ArtefatoRepository(
+                apiService = RetrofitClient.apiService,                       // sua API
+                dao = AppDatabase.getDatabase(requireContext()).artefatoDao(),
+                context = requireContext()
+            )
+        )
+    }
     private var _binding: FragmentArtifactBinding? = null
     private val binding get() = _binding!!
 
     // campos
     private lateinit var etArea: TextInputEditText
+    private lateinit var etQuadra: TextInputEditText
     private lateinit var etSondagem: TextInputEditText
     private lateinit var etGps: TextInputEditText
     private lateinit var etNivel: TextInputEditText
@@ -42,6 +56,7 @@ class ArtifactDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         // Inicializa campos a partir do binding
         etArea = binding.etArea
+        etQuadra = binding.etQuadra
         etSondagem = binding.etSondagem
         etGps = binding.etGps
         etNivel = binding.etNivel
@@ -63,7 +78,7 @@ class ArtifactDetailFragment : Fragment() {
         // Salvar/Atualizar
         btnSalvar.setOnClickListener {
             transferFormToViewModel()
-            viewModel.saveOrUpdateArtifact()
+            viewModel.saveArtifact()
         }
 
         // Deletar
@@ -80,10 +95,26 @@ class ArtifactDetailFragment : Fragment() {
             }
         }
 
+        binding.btnFoto.setOnClickListener {
+            abrirGaleria()
+        }
+
+        // Toolbar voltar
+        binding.btnVoltar.setOnClickListener{
+            findNavController().navigateUp()
+        }
+
         // Observa sucesso do salvamento e fecha
         viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
             if (success == true) {
                 // limpa edição atual para evitar reaproveitamento indevido
+                viewModel.clearEditionIfNeeded()
+                findNavController().popBackStack()
+            }
+        }
+
+        viewModel.deleteSuccess.observe(viewLifecycleOwner) { success ->
+            if (success) {
                 viewModel.clearEditionIfNeeded()
                 findNavController().popBackStack()
             }
@@ -99,13 +130,14 @@ class ArtifactDetailFragment : Fragment() {
 
             // Se modo criação preenche area com quadra
             if (viewModel.artefatoEditavel.value == null) {
-                etArea.setText(quadra)
+                etQuadra.setText(quadra)
             }
         }
 
         viewModel.artefatoEditavel.observe(viewLifecycleOwner) { artefato ->
             artefato?.let {
                 etArea.setText(it.area)
+                etQuadra.setText(it.quadra)
                 etSondagem.setText(it.sondagem)
                 etGps.setText(it.pontoGPS)
                 etNivel.setText(it.nivel)
@@ -122,6 +154,7 @@ class ArtifactDetailFragment : Fragment() {
 
     private fun transferFormToViewModel() {
         viewModel.area.value = etArea.text?.toString() ?: ""
+        viewModel.quadra.value = etQuadra.text?.toString() ?: ""
         viewModel.sondagem.value = etSondagem.text?.toString() ?: ""
         viewModel.pontoGPS.value = etGps.text?.toString()?.takeIf { it.isNotBlank() }
 
@@ -135,6 +168,19 @@ class ArtifactDetailFragment : Fragment() {
         viewModel.data.value = etData.text?.toString()?.takeIf { it.isNotBlank() }
         viewModel.pesquisador.value = etPesquisador.text?.toString()?.takeIf { it.isNotBlank() }
         viewModel.obs.value = etObs.text?.toString()?.takeIf { it.isNotBlank() }
+    }
+
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            binding.imgArtefato.setImageURI(it)
+            viewModel.fotoCaminho.value = it.toString()
+        }
+    }
+
+    private fun abrirGaleria() {
+        pickImageLauncher.launch("image/*")
     }
 
     override fun onDestroyView() {
