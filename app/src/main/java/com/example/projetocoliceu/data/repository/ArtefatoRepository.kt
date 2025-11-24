@@ -41,7 +41,7 @@ class ArtefatoRepository(
 
     // C - CREATE & U - UPDATE (Local)
     suspend fun saveArtifact(artefato: Artefato): Artefato {
-        // 🛠️ CORREÇÃO: Passando explicitamente o syncStatus (Corrigindo "No value passed for parameter 'syncStatus'")
+        // CORREÇÃO: Passando explicitamente o syncStatus (Corrigindo "No value passed for parameter 'syncStatus'")
         val entityToSave = artefato.toArtefatoEntity(PENDING_SYNC)
         dao.insert(entityToSave)
         startSyncWorker()
@@ -50,9 +50,7 @@ class ArtefatoRepository(
 
     // D - DELETE (Marca Local)
     suspend fun deleteArtifact(artefato: Artefato) {
-        // 🛠️ CORREÇÃO: Passando explicitamente o syncStatus (Corrigindo "No value passed for parameter 'syncStatus'")
-        val deletePending = artefato.toArtefatoEntity(PENDING_DELETE)
-        dao.update(deletePending)
+        dao.deleteById(artefato.id) // remove imediatamente
         startSyncWorker()
     }
 
@@ -66,7 +64,7 @@ class ArtefatoRepository(
 
 
     suspend fun fetchAllArtifactsRemote(): List<Artefato> {
-        // 🛠️ CORREÇÃO: Mapeando ArtefatoEntity para Artefato após a chamada da API
+        // CORREÇÃO: Mapeando ArtefatoEntity para Artefato após a chamada da API
         return apiService.fetchAllArtifacts().map { it.toArtefatoModel() }
     }
 

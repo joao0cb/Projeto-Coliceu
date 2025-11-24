@@ -1,6 +1,5 @@
 package com.example.projetocoliceu.data.db
 
-import com.example.projetocoliceu.data.model.Artefato
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID
@@ -37,7 +36,7 @@ data class ArtefatoEntity(
     val yRelativo: Float,
     val fotoCaminho: String?,
 
-    val syncStatus: Int
+    val syncStatus: Int = 0
 
 )
 

@@ -1,7 +1,7 @@
 package com.example.projetocoliceu.data.model
-
 import com.example.projetocoliceu.data.db.ArtefatoEntity
 import java.util.UUID
+
 data class Artefato(
     // 1. Identificação Espacial (Para o mapa e localização)
     val id: String = UUID.randomUUID().toString(),
@@ -32,17 +32,15 @@ data class Artefato(
 
 fun Artefato.toArtefatoEntity(syncStatus: Int): ArtefatoEntity {
     return ArtefatoEntity(
-        id = this.id, // AGORA O NOME ESTÁ PADRONIZADO
+        id = this.id,
         quadra = this.quadra,
         area = this.area,
-        // ** CAMPOS FALTANTES ADICIONADOS **
         sondagem = this.sondagem,
         pontoGPS = this.pontoGPS,
         camada = this.camada,
         decapagem = this.decapagem,
         quantidade = this.quantidade,
         fotoCaminho = this.fotoCaminho,
-        // ---------------------------------
         nivel = this.nivel,
         material = this.material,
         xRelativo = this.xRelativo,
@@ -60,14 +58,12 @@ fun ArtefatoEntity.toArtefatoModel(): Artefato {
         id = this.id,
         quadra = this.quadra,
         area = this.area,
-        // ** CAMPOS FALTANTES ADICIONADOS **
         sondagem = this.sondagem,
         pontoGPS = this.pontoGPS,
         camada = this.camada,
         decapagem = this.decapagem,
         quantidade = this.quantidade,
         fotoCaminho = this.fotoCaminho,
-        // ---------------------------------
         nivel = this.nivel,
         material = this.material,
         xRelativo = this.xRelativo,

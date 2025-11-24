@@ -14,22 +14,22 @@ class MapViewModel(private val repository: ArtefatoRepository) : ViewModel() {
 
     private val _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: LiveData<Boolean> = _isLoading
-    private val _navigationEvent = MutableLiveData<Artefato>()
+    /** private val _navigationEvent = MutableLiveData<Artefato>()
     val navigationEvent: LiveData<Artefato> = _navigationEvent
 
-    /**
+
      * Função para preparar a criação de um novo Artefato
-     */
+
     fun startNewArtefato(nomeQuadra: String, xRelativo: Float, yRelativo: Float) {
         // Exemplo de criação do objeto inicial
         val novo = Artefato(
             id = UUID.randomUUID().toString(),
             quadra = nomeQuadra,
-            area = "",
-            sondagem = "",
+            area = nomeQuadra,
+            sondagem = "N/A",
             pontoGPS = null,
-            nivel = "",
-            camada = "",
+            nivel = "1",
+            camada = "I",
             decapagem = null,
             material = "",
             quantidade = 1,
@@ -43,7 +43,7 @@ class MapViewModel(private val repository: ArtefatoRepository) : ViewModel() {
 
         // Dispara o evento de navegação para a Activity
         _navigationEvent.value = novo
-    }
+    } */
 }
 
 
