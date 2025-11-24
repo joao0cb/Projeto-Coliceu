@@ -20,4 +20,8 @@ object RetrofitClient {
     val apiService: ArtifactApiService by lazy {
         retrofit.create(ArtifactApiService::class.java)
     }
+
+    val cadastroApi: cadastroApiService by lazy {
+        retrofit.create(cadastroApiService::class.java)
+    }
 }

@@ -1,34 +1,31 @@
-// ArtifactApiService.kt (Corrigido)
 package com.example.projetocoliceu.data.api
 
-import com.example.projetocoliceu.data.db.ArtefatoEntity
-import com.example.projetocoliceu.data.model.Artefato
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
+import java.util.UUID
 
-interface ArtifactApiService {
+class ArtefatoApiModel (
+    // 1. Identificação Espacial (Para o mapa e localização)
+    val id: String = UUID.randomUUID().toString(),
+    val quadra: String,
+    val area: String,
+    val sondagem: String,
+    val pontoGPS: String?,
 
-    // Buscar todos
-    @GET("api/artifacts")
-    suspend fun fetchAllArtifacts(): List<ArtefatoEntity>
+    // 2. Contexto Estratigráfico (Onde o achado estava)
+    val nivel: String,
+    val camada: String,
+    val decapagem: String?,
 
-    // Criar (POST)
-    @POST("api/artifacts")
-    suspend fun createArtifact(@Body ficha: Artefato): Artefato
+    // 3. Informações do achado
+    val material: String,
+    val quantidade: Int = 1,
 
-    // Atualizar (PUT)
-    @PUT("api/artifacts/{id}")
-    suspend fun updateArtifact(@Path("id") id: String, @Body ficha: Artefato): Artefato
+    // 4. Logística e Registro
+    val data: String,
+    val pesquisador: String,
+    val obs: String?,
 
-    // Deletar (DELETE)
-    @DELETE("api/artifacts/{id}")
-    suspend fun deleteArtifact(@Path("id") id: String)
-
-    // Buscar por ID (GET) - Função corrigida para ser suspend e usar Path
-    @GET("api/artifacts/{id}")
-    suspend fun fetchArtifactById(@Path("id") id: String): Artefato
-}
+    // Coordenadas relativas para posicionar no CustomView (mapa)
+    val xRelativo: Float, // Posição X dentro da quadra (0.0 a 1.0)
+    val yRelativo: Float,
+    val fotoCaminho: String?
+)
