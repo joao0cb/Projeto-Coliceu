@@ -3,13 +3,60 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/MapaArqueologicoFragment">
+    app:startDestination="@id/HomeFragment">
 
+    <!-- Tela inicial -->
+    <fragment
+        android:id="@+id/HomeFragment"
+        android:name="com.example.projetocoliceu.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_home_to_login"
+            app:destination="@id/LoginFragment" />
+
+        <action
+            android:id="@+id/action_home_to_cadastro"
+            app:destination="@id/CadastroUsuarioFragment" />
+    </fragment>
+
+
+    <!-- Login -->
+    <fragment
+        android:id="@+id/LoginFragment"
+        android:name="com.example.projetocoliceu.ui.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+
+        <action
+            android:id="@+id/action_login_to_cadastro"
+            app:destination="@id/CadastroUsuarioFragment" />
+
+        <action
+            android:id="@+id/action_login_to_mapa"
+            app:destination="@id/MapaArqueologicoFragment" />
+    </fragment>
+
+
+    <!-- Cadastro de Usuário -->
+    <fragment
+        android:id="@+id/CadastroUsuarioFragment"
+        android:name="com.example.projetocoliceu.ui.auth.CadastroUsuarioFragment"
+        android:label="Cadastro de Usuário"
+        tools:layout="@layout/fragment_cadastro">
+
+        <action
+            android:id="@+id/action_cadastro_to_login"
+            app:destination="@id/LoginFragment" />
+    </fragment>
+
+
+    <!-- Mapa -->
     <fragment
         android:id="@+id/MapaArqueologicoFragment"
         android:name="com.example.projetocoliceu.ui.map.MapaArqueologicoFragment"
-        android:label="Map"
+        android:label="Mapa Arqueológico"
         tools:layout="@layout/fragment_map">
 
         <action
@@ -17,10 +64,12 @@
             app:destination="@id/ArtifactDetailFragment" />
     </fragment>
 
+
+    <!-- Detalhes do Artefato -->
     <fragment
         android:id="@+id/ArtifactDetailFragment"
         android:name="com.example.projetocoliceu.ui.artifact.ArtifactDetailFragment"
-        android:label="Detalhe Artefato"
+        android:label="Detalhe do Artefato"
         tools:layout="@layout/fragment_artifact" />
 
 </navigation>

@@ -26,11 +26,11 @@ class HomeFragment : Fragment() {
         val btnCadastro = view.findViewById<MaterialButton>(R.id.btnCadastro)
 
         btnLogin.setOnClickListener {
-            findNavController().navigate(R.id.loginFragment)
+            findNavController().navigate(R.id.action_home_to_login)
         }
 
         btnCadastro.setOnClickListener {
-            findNavController().navigate(R.id.cadastroUsuarioFragment)
+            findNavController().navigate(R.id.action_home_to_cadastro)
         }
     }
 }

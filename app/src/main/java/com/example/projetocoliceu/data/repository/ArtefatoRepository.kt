@@ -13,6 +13,8 @@ import com.example.projetocoliceu.data.db.ArtefatoDao
 import com.example.projetocoliceu.data.api.ArtifactApiService
 import com.example.projetocoliceu.data.db.ArtefatoEntity
 import com.example.projetocoliceu.worker.SyncWorker
+import com.example.projetocoliceu.data.model.toDomain
+import com.example.projetocoliceu.data.model.toApiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -64,32 +66,28 @@ class ArtefatoRepository(
 
 
     suspend fun fetchAllArtifactsRemote(): List<Artefato> {
-        // CORREÇÃO: Mapeando ArtefatoEntity para Artefato após a chamada da API
-        return apiService.fetchAllArtifacts().map { it.toArtefatoModel() }
+        return apiService.fetchAllArtifacts().map { it.toDomain() }
     }
 
     /**
      * PUSH: Envia um novo artefato para o servidor.
      */
     suspend fun createArtifactRemote(artefatoEntity: ArtefatoEntity): Artefato {
-        val artefatoModel = artefatoEntity.toArtefatoModel()
-        return apiService.createArtifact(artefatoModel)
+        val artefatoModel = artefatoEntity.toArtefatoModel().toApiModel()
+        return apiService.createArtifact(artefatoModel).toDomain()
     }
 
     /**
      * PUSH: Atualiza um artefato existente no servidor.
      */
     suspend fun updateArtifactRemote(artefatoEntity: ArtefatoEntity): Artefato {
-        val artefatoModel = artefatoEntity.toArtefatoModel()
-        return apiService.updateArtifact(artefatoEntity.id, artefatoModel)
+        val apiModel = artefatoEntity.toArtefatoModel().toApiModel()
+        val updated = apiService.updateArtifact(artefatoEntity.id, apiModel)
+        return updated.toDomain()
     }
 
     suspend fun deleteArtifactRemote(idCartao: String) = apiService.deleteArtifact(idCartao)
 
-    /**
-     * Atualiza um artefato localmente e marca para sincronização.
-     * Lembre-se: este método é 'suspend' — chame dentro de coroutine (viewModelScope.launch {...}).
-     */
     suspend fun updateArtifact(artefato: Artefato): Artefato {
         // Converte o modelo para entidade (passando o status de sync pendente)
         val entityToUpdate = artefato.toArtefatoEntity(PENDING_SYNC)

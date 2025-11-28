@@ -10,7 +10,7 @@ import com.example.projetocoliceu.R
 import com.google.android.material.button.MaterialButton
 import android.widget.TextView
 
-class loginFragment : Fragment() {
+class LoginFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -26,11 +26,11 @@ class loginFragment : Fragment() {
         val tvIrParaCadastro = view.findViewById<TextView>(R.id.tvIrParaCadastro)
 
         tvIrParaCadastro.setOnClickListener {
-            findNavController().navigate(R.id.cadastroUsuarioFragment)
+            findNavController().navigate(R.id.action_login_to_cadastro)
         }
 
         btnEntrar.setOnClickListener {
-            findNavController().navigate(R.id.MapArqueologicoFragment)
+            findNavController().navigate(R.id.action_login_to_mapa)
         }
     }
 }

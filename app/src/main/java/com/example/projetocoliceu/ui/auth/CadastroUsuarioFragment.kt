@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.viewModels
 import com.example.projetocoliceu.R
 import com.example.projetocoliceu.viewmodel.CadastroUsuarioViewModel
@@ -23,7 +24,7 @@ class CadastroUsuarioFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Crie um layout XML chamado 'fragment_cadastro_usuario'
-        val view = inflater.inflate(R.layout.fragment_cadastro_usuario, container, false)
+        val view = inflater.inflate(R.layout.fragment_cadastro, container, false)
 
         val etNome = view.findViewById<EditText>(R.id.et_nome_cadastro)
         val etEmail = view.findViewById<EditText>(R.id.et_email_cadastro)
