@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projetocoliceu.data.model.User
-import com.example.projetocoliceu.data.repository.CadastroRepository
 import kotlinx.coroutines.launch
+import com.example.projetocoliceu.data.model.User
+import com.example.projetocoliceu.data.repository.UserRepository // Assumindo que este é o novo UserRepository
 
-class CadastroUsuarioViewModel : ViewModel() {
-
-    private val repository = CadastroRepository()
+// O Repositório deve ser injetado via construtor, não instanciado diretamente.
+class CadastroUsuarioViewModel(private val repository: UserRepository) : ViewModel() {
+    // ^ CORREÇÃO AQUI: Recebendo o Repositório
 
     // LiveData para observar o resultado na tela
     private val _cadastroSucesso = MutableLiveData<Boolean>()
@@ -35,14 +35,16 @@ class CadastroUsuarioViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val response = repository.cadastrarUsuario(novoUsuario)
-                if (response.isSuccessful) {
-                    _cadastroSucesso.value = true
-                } else {
-                    _mensagemErro.value = "Erro: ${response.code()} - Tente outro email."
-                }
+                // CORREÇÃO: Chamando o método local. Ele lança uma exceção se falhar (ex: email duplicado).
+                repository.cadastrarUsuario(novoUsuario)
+
+                // Se o código chegou até aqui, significa que o cadastro foi bem-sucedido no Room.
+                _cadastroSucesso.value = true
+
             } catch (e: Exception) {
-                _mensagemErro.value = "Falha na conexão: ${e.message}"
+                // CORREÇÃO: Capturando a exceção lançada pelo UserRepository (ex: "O email já está cadastrado.")
+                // e.message é a mensagem de erro que você configurou no Repositório.
+                _mensagemErro.value = "Falha no cadastro: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

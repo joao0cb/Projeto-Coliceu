@@ -5,30 +5,31 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.projetocoliceu.data.db.UserEntity
 
-// Certifique-se de listar todas as suas entidades aqui
-@Database(entities = [ArtefatoEntity::class], version = 1, exportSchema = false)
+// ATUALIZE A LISTA DE ENTIDADES e INCREMENTE A VERSÃO!
+@Database(entities = [ArtefatoEntity::class, UserEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
-    // Método que o Repositório irá chamar para obter o DAO
     abstract fun artefatoDao(): ArtefatoDao
+    // ADICIONE O NOVO DAO
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
         fun getDatabase(context: Context): AppDatabase {
-            // Se a instância já existe, retorna ela
             return INSTANCE ?: synchronized(this) {
-                // Se a instância é nula, cria o banco de dados
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "artefato_database"
+                    "app_database" // Renomeei para ser mais genérico que "artefato_database"
                 )
-                    // Se você não tiver migrações, pode usar .fallbackToDestructiveMigration()
-                    // para fins de desenvolvimento
-                    // .fallbackToDestructiveMigration()
+                    // Importante: Se você alterar a versão do banco (de 1 para 2),
+                    // e não tiver migrações, use fallbackToDestructiveMigration()
+                    // durante o desenvolvimento para evitar crashs.
+                    .fallbackToDestructiveMigration() // <--- ADICIONADO/ALTERADO
                     .build()
                 INSTANCE = instance
                 instance
