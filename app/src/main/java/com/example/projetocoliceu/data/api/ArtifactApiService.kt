@@ -1,31 +1,25 @@
 package com.example.projetocoliceu.data.api
 
-import java.util.UUID
+import retrofit2.http.*
 
-class ArtefatoApiModel (
-    // 1. Identificação Espacial (Para o mapa e localização)
-    val id: String = UUID.randomUUID().toString(),
-    val quadra: String,
-    val area: String,
-    val sondagem: String,
-    val pontoGPS: String?,
+interface ArtifactApiService {
 
-    // 2. Contexto Estratigráfico (Onde o achado estava)
-    val nivel: String,
-    val camada: String,
-    val decapagem: String?,
+    @GET("artefatos")
+    suspend fun fetchAllArtifacts(): List<ArtefatoApiModel>
 
-    // 3. Informações do achado
-    val material: String,
-    val quantidade: Int = 1,
+    @POST("artefatos")
+    suspend fun createArtifact(
+        @Body artefato: ArtefatoApiModel
+    ): ArtefatoApiModel
 
-    // 4. Logística e Registro
-    val data: String,
-    val pesquisador: String,
-    val obs: String?,
+    @PUT("artefatos/{id}")
+    suspend fun updateArtifact(
+        @Path("id") id: String,
+        @Body artefato: ArtefatoApiModel
+    ): ArtefatoApiModel
 
-    // Coordenadas relativas para posicionar no CustomView (mapa)
-    val xRelativo: Float, // Posição X dentro da quadra (0.0 a 1.0)
-    val yRelativo: Float,
-    val fotoCaminho: String?
-)
+    @DELETE("artefatos/{id}")
+    suspend fun deleteArtifact(
+        @Path("id") id: String
+    )
+}

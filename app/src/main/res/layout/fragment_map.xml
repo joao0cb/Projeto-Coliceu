@@ -8,7 +8,6 @@
     android:background="@drawable/bg_gradiente"
     tools:context=".ui.map.MapaArqueologicoFragment">
 
-    <!-- ======================= APP BAR FIXA NO TOPO (com logo central) ======================= -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/app_bar_top"
         android:layout_width="411dp"
@@ -19,7 +18,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/top_app_bar_menu">
 
-        <!-- Logo central dentro da Toolbar -->
         <ImageView
             android:id="@+id/toolbar_logo"
             android:layout_width="48dp"
@@ -29,7 +27,6 @@
             android:src="@drawable/logo" />
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- ============ LINHA FIXA: BUSSOLA + TEXTO + BOTÃO ADICIONAR ============ -->
     <LinearLayout
         android:id="@+id/top_info_row"
         android:layout_width="383dp"
@@ -42,16 +39,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/app_bar_top">
 
-        <!-- Ícone da bússola -->
         <ImageView
             android:id="@+id/bussola"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/bussola" />
-
-        <!-- Texto principal -->
-
-        <!-- Botão Adicionar -->
 
         <TextView
             android:id="@+id/textMain"
@@ -71,36 +63,22 @@
 
     </LinearLayout>
 
-    <!-- ======================= MAPA SCROLLÁVEL ======================= -->
     <ScrollView
         android:id="@+id/scroll_mapa"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/top_info_row"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation_bar"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="null">
 
-        <!-- Sua custom view do mapa dentro do ScrollView -->
         <com.example.projetocoliceu.ui.map.MapaArqueologico
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white" />
     </ScrollView>
-
-    <!-- ======================= BOTTOM NAVIGATION FIXA NO FUNDO ======================= -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation_bar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_gradiente_nav"
-        app:itemIconTint="@drawable/bottom_nav_icon_color"
-        app:menu="@menu/bottom_nav_menu"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
