@@ -42,6 +42,9 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    private val _artefatosUpdated = MutableLiveData<Boolean>()
+    val artefatosUpdated: LiveData<Boolean> = _artefatosUpdated
+
     private val _artifact = MutableLiveData<Artefato>()
     val artifact: LiveData<Artefato> get() = _artifact
 
@@ -53,6 +56,7 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
     // Coordenadas/Localização
     val area = MutableLiveData<String>() // Obrigatório (ex: "C5")
 
+    val nome = MutableLiveData<String>()
     val quadra = MutableLiveData<String>()
     val sondagem = MutableLiveData<String>() // Inicialmente preenchido pelo mapa
     val pontoGPS = MutableLiveData<String?>() // Opcional
@@ -88,6 +92,7 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
         // Define valores padrão se estiver em modo de criação
         if (_artefatoEditavel.value == null) {
             area.value = ""
+            nome.value= ""
             nivel.value = 1
             camada.value = "I"
             material.value = ""        // será preenchido pelo usuário
@@ -101,9 +106,18 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
             // Preencher data atual (ou deixar a função save cuidar disso)
         }
     }
+    private val _mapId = MutableLiveData<String>()
+    val mapId: LiveData<String> get() = _mapId
+
+    fun setMapId(id: String) {
+        _mapId.value = id
+    }
+
     fun saveArtifact() {
         val art = Artefato(
             area = area.value ?: "",
+            nome = nome.value ?: "",
+            mapId = _mapId.value ?: return,
             quadra = quadra.value ?: "",
             sondagem = sondagem.value ?: "",
             pontoGPS = pontoGPS.value,
@@ -122,7 +136,9 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
 
         viewModelScope.launch {
             repository.saveArtifact(art)
-            _saveSuccess.postValue(true)  // dispara o observer no fragment
+            _saveSuccess.postValue(true) // dispara o observer no fragment
+
+            _artefatosUpdated.postValue(true)
         }
     }
 
@@ -134,6 +150,7 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
             quadra.value = _initialQuadra.value ?: ""
             sondagem.value = _initialSondagem.value ?: ""
             area.value = ""
+            nome.value = ""
             pontoGPS.value = null
             nivel.value = 1
             camada.value = "I"
@@ -148,6 +165,7 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
             // Preenche com dados do artefato (sua implementação já tinha isso; pode reutilizar)
             quadra.value = artefato.quadra
             area.value = artefato.area
+            nome.value = artefato.nome
             sondagem.value = artefato.sondagem
             pontoGPS.value = artefato.pontoGPS
             nivel.value = artefato.nivel.toIntOrNull()
@@ -194,12 +212,13 @@ class ArtifactViewModel(private val repository: ArtefatoRepository) : ViewModel(
             try {
                 repository.deleteArtifact(artefato)
                 fetchArtifacts()
-                _saveSuccess.postValue(false)
+                _deleteSuccess.postValue(true) // aqui dispara o observer no fragment
             } catch (e: Exception) {
-
+                _deleteSuccess.postValue(false) // opcional, para indicar falha
             }
         }
     }
+
 
 
 }

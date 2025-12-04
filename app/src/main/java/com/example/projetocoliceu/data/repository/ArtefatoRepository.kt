@@ -41,6 +41,9 @@ class ArtefatoRepository(
             }
     }
 
+    fun getArtifactsByMap(mapId: String) = dao.getArtifactsByMap(mapId)
+
+
     // C - CREATE & U - UPDATE (Local)
     suspend fun saveArtifact(artefato: Artefato): Artefato {
         // CORREÇÃO: Passando explicitamente o syncStatus (Corrigindo "No value passed for parameter 'syncStatus'")

@@ -8,13 +8,14 @@ import androidx.room.RoomDatabase
 import com.example.projetocoliceu.data.db.UserEntity
 
 // ATUALIZE A LISTA DE ENTIDADES e INCREMENTE A VERSÃO!
-@Database(entities = [ArtefatoEntity::class, UserEntity::class], version = 2, exportSchema = false)
+@Database(entities = [ArtefatoEntity::class, UserEntity::class, MapEntity::class], version = 4, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun artefatoDao(): ArtefatoDao
     // ADICIONE O NOVO DAO
     abstract fun userDao(): UserDao
 
+    abstract fun mapDao(): MapDao
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null

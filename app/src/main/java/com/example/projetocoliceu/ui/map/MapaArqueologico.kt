@@ -48,10 +48,6 @@ class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, a
     // --- MÉTODOS PÚBLICOS PARA INTERAÇÃO COM A ACTIVITY ---
 
     // 1. Recebe a lista de artefatos observada do ViewModel
-    fun setArtefatos(newArtefatos: List<Artefato>) {
-        this.artefatos = newArtefatos
-        invalidate() // Força o Android a chamar o onDraw() novamente para desenhar os marcadores
-    }
 
     // 2. Recebe a instância do ViewModel
     fun setViewModel(viewModel: MapViewModel) {
@@ -94,6 +90,11 @@ class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, a
                 canvas.drawText(quadraLabel, textX, textY, textPaint)
             }
         }
+    }
+
+    fun setArtefatos(newArtefatos: List<Artefato>) {
+        this.artefatos = newArtefatos
+        invalidate() // Força o Android a chamar o onDraw() novamente para desenhar os marcadores
     }
 
     private fun drawArtefatos(canvas: Canvas, quadraPixelLargura: Float, quadraPixelAltura: Float) {

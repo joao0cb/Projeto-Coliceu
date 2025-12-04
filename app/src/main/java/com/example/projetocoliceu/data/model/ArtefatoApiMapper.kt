@@ -8,6 +8,8 @@ import com.example.projetocoliceu.data.api.ArtefatoApiModel
 fun ArtefatoApiModel.toDomain(): Artefato {
     return Artefato(
         id = this.id,
+        nome = this.nome,
+        mapId = this.mapId,
         quadra = this.quadra,
         area = this.area,
         sondagem = this.sondagem,
@@ -36,6 +38,8 @@ fun ArtefatoApiModel.toDomain(): Artefato {
 fun Artefato.toApiModel(): ArtefatoApiModel {
     return ArtefatoApiModel(
         id = this.id,
+        nome = this.nome,
+        mapId = this.mapId,
         quadra = this.quadra,
         area = this.area,
         sondagem = this.sondagem,

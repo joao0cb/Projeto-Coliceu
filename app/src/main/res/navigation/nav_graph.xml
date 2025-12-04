@@ -3,73 +3,107 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/HomeFragment">
+    app:startDestination="@id/homeFragment">
 
     <!-- Tela inicial -->
     <fragment
-        android:id="@+id/HomeFragment"
+        android:id="@+id/homeFragment"
         android:name="com.example.projetocoliceu.ui.home.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home">
 
         <action
             android:id="@+id/action_home_to_login"
-            app:destination="@id/LoginFragment" />
+            app:destination="@id/loginFragment" />
 
         <action
             android:id="@+id/action_home_to_cadastro"
-            app:destination="@id/CadastroUsuarioFragment" />
+            app:destination="@id/cadastroUsuarioFragment" />
     </fragment>
-
 
     <!-- Login -->
     <fragment
-        android:id="@+id/LoginFragment"
+        android:id="@+id/loginFragment"
         android:name="com.example.projetocoliceu.ui.auth.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login">
 
         <action
             android:id="@+id/action_login_to_cadastro"
-            app:destination="@id/CadastroUsuarioFragment" />
+            app:destination="@id/cadastroUsuarioFragment" />
 
         <action
             android:id="@+id/action_login_to_mapa"
-            app:destination="@id/MapaArqueologicoFragment" />
+            app:destination="@id/mapsFragment" />
     </fragment>
-
 
     <!-- Cadastro de Usuário -->
     <fragment
-        android:id="@+id/CadastroUsuarioFragment"
+        android:id="@+id/cadastroUsuarioFragment"
         android:name="com.example.projetocoliceu.ui.auth.CadastroUsuarioFragment"
         android:label="Cadastro de Usuário"
         tools:layout="@layout/fragment_cadastro">
 
         <action
             android:id="@+id/action_cadastro_to_login"
-            app:destination="@id/LoginFragment" />
+            app:destination="@id/loginFragment" />
     </fragment>
 
-
-    <!-- Mapa -->
+    <!-- Lista de Mapas -->
     <fragment
-        android:id="@+id/MapaArqueologicoFragment"
+        android:id="@+id/mapsFragment"
+        android:name="com.example.projetocoliceu.ui.map.MapsFragment"
+        android:label="Meus Mapas"
+        tools:layout="@layout/fragment_maps">
+
+        <action
+            android:id="@+id/action_maps_to_mapaArqueologico"
+            app:destination="@id/mapaArqueologicoFragment" />
+    </fragment>
+
+    <!-- Mapa Arqueológico -->
+    <fragment
+        android:id="@+id/mapaArqueologicoFragment"
         android:name="com.example.projetocoliceu.ui.map.MapaArqueologicoFragment"
         android:label="Mapa Arqueológico"
         tools:layout="@layout/fragment_map">
 
+        <argument
+            android:name="mapId"
+            app:argType="string" />
+
         <action
-            android:id="@+id/action_MapaArqueologicoFragment_to_ArtifactDetailFragment"
-            app:destination="@id/ArtifactDetailFragment" />
+            android:id="@+id/action_mapaArqueologico_to_artifactList"
+            app:destination="@id/artifactListFragment" />
+
+        <action
+            android:id="@+id/action_mapaArqueologico_to_artifactDetail"
+            app:destination="@id/artifactDetailFragment" />
     </fragment>
 
+    <!-- Lista de Artefatos -->
+    <fragment
+        android:id="@+id/artifactListFragment"
+        android:name="com.example.projetocoliceu.ui.artifact.ArtifactListFragment"
+        android:label="Artefatos"
+        tools:layout="@layout/fragment_artifact_list">
+
+        <action
+            android:id="@+id/actionArtifactListToArtifactDetail"
+            app:destination="@id/artifactDetailFragment" />
+    </fragment>
 
     <!-- Detalhes do Artefato -->
     <fragment
-        android:id="@+id/ArtifactDetailFragment"
+        android:id="@+id/artifactDetailFragment"
         android:name="com.example.projetocoliceu.ui.artifact.ArtifactDetailFragment"
-        android:label="Detalhe do Artefato"
-        tools:layout="@layout/fragment_artifact" />
+        android:label="Detalhes do Artefato"
+        tools:layout="@layout/fragment_artifact">
+
+        <argument
+            android:name="mapId"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
 
 </navigation>

@@ -18,6 +18,9 @@ interface ArtefatoDao {
     @Query("SELECT * FROM artefatos WHERE id = :id")
     suspend fun getArtefatoById(id: String): ArtefatoEntity?
 
+    @Query("SELECT * FROM artefatos WHERE mapId = :mapId")
+    fun getArtifactsByMap(mapId: String): Flow<List<ArtefatoEntity>>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(artefato: ArtefatoEntity)
 

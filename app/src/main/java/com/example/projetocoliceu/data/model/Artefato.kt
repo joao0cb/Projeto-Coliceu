@@ -5,6 +5,8 @@ import java.util.UUID
 data class Artefato(
     // 1. Identificação Espacial (Para o mapa e localização)
     val id: String = UUID.randomUUID().toString(),
+    val nome: String,
+    val mapId: String,
     val quadra: String,
     val area: String,
     val sondagem: String,
@@ -33,6 +35,8 @@ data class Artefato(
 fun Artefato.toArtefatoEntity(syncStatus: Int): ArtefatoEntity {
     return ArtefatoEntity(
         id = this.id,
+        nome= this.nome,
+        mapId = this.mapId,
         quadra = this.quadra,
         area = this.area,
         sondagem = this.sondagem,
@@ -56,6 +60,8 @@ fun Artefato.toArtefatoEntity(syncStatus: Int): ArtefatoEntity {
 fun ArtefatoEntity.toArtefatoModel(): Artefato {
     return Artefato(
         id = this.id,
+        nome= this.nome,
+        mapId = this.mapId,
         quadra = this.quadra,
         area = this.area,
         sondagem = this.sondagem,

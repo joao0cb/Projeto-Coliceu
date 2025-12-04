@@ -1,10 +1,12 @@
 package com.example.projetocoliceu.ui.artifact
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,23 +17,44 @@ import com.example.projetocoliceu.data.repository.ArtefatoRepository
 import com.example.projetocoliceu.databinding.FragmentArtifactBinding
 import com.example.projetocoliceu.viewmodel.ArtifactViewModel
 import com.example.projetocoliceu.viewmodel.ArtifactViewModelFactory
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import androidx.navigation.fragment.navArgs
+import com.example.projetocoliceu.data.repository.MapRepository
+import com.example.projetocoliceu.viewmodel.MapViewModel
+import com.example.projetocoliceu.viewmodel.MapViewModelFactory
 
 class ArtifactDetailFragment : Fragment() {
 
-    private val viewModel: ArtifactViewModel by activityViewModels {
+    private val args: ArtifactDetailFragmentArgs by navArgs()
+    private val viewModel: ArtifactViewModel by lazy {
         ArtifactViewModelFactory(
             ArtefatoRepository(
-                apiService = RetrofitClient.apiService,                       // sua API
+                apiService = RetrofitClient.apiService,
                 dao = AppDatabase.getDatabase(requireContext()).artefatoDao(),
                 context = requireContext()
             )
+        ).create(ArtifactViewModel::class.java)
+    }
+
+    private val mapViewModel: MapViewModel by activityViewModels {
+        MapViewModelFactory(
+            ArtefatoRepository(
+                RetrofitClient.apiService,
+                AppDatabase.getDatabase(requireContext()).artefatoDao(),
+                requireContext()
+            ),
+            MapRepository(
+                AppDatabase.getDatabase(requireContext()).mapDao()
+            )
         )
     }
+
     private var _binding: FragmentArtifactBinding? = null
     private val binding get() = _binding!!
 
     // campos
+    private lateinit var etNome: TextInputEditText
     private lateinit var etArea: TextInputEditText
     private lateinit var etQuadra: TextInputEditText
     private lateinit var etSondagem: TextInputEditText
@@ -54,7 +77,15 @@ class ArtifactDetailFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val mapId = args.mapId
+        viewModel.setMapId(mapId)
+        Log.d("ArtifactDetailFragment", "mapId recebido: $mapId")
+        if (mapId == null) {
+            Log.e("ArtifactDetailFragment", "Nenhum mapId recebido!")
+            return
+        }
         // Inicializa campos a partir do binding
+        etNome = binding.etNome
         etArea = binding.etArea
         etQuadra = binding.etQuadra
         etSondagem = binding.etSondagem
@@ -77,8 +108,13 @@ class ArtifactDetailFragment : Fragment() {
 
         // Salvar/Atualizar
         btnSalvar.setOnClickListener {
+            Toast.makeText(requireContext(), "Clique detectado!", Toast.LENGTH_SHORT).show()
             transferFormToViewModel()
-            viewModel.saveArtifact()
+            if (viewModel.mapId.value == null) {
+                Snackbar.make(binding.root, "Erro: nenhum mapa selecionado!", Snackbar.LENGTH_LONG).show()
+            } else {
+                viewModel.saveArtifact()
+            }
         }
 
         // Deletar
@@ -119,6 +155,18 @@ class ArtifactDetailFragment : Fragment() {
                 findNavController().popBackStack()
             }
         }
+
+        viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
+            if (success == true) {
+                // Atualiza lista de artefatos do mapa
+                mapViewModel.getArtifactsByMap(viewModel.mapId.value!!)
+
+                // Limpa edição e volta
+                viewModel.clearEditionIfNeeded()
+                findNavController().popBackStack()
+            }
+        }
+
     }
 
     private fun setupFormObservers(tvQuadraInfo: TextView) {
@@ -136,6 +184,7 @@ class ArtifactDetailFragment : Fragment() {
 
         viewModel.artefatoEditavel.observe(viewLifecycleOwner) { artefato ->
             artefato?.let {
+                etNome.setText(it.nome)
                 etArea.setText(it.area)
                 etQuadra.setText(it.quadra)
                 etSondagem.setText(it.sondagem)
@@ -153,6 +202,7 @@ class ArtifactDetailFragment : Fragment() {
     }
 
     private fun transferFormToViewModel() {
+        viewModel.nome.value = etNome.text?.toString() ?: ""
         viewModel.area.value = etArea.text?.toString() ?: ""
         viewModel.quadra.value = etQuadra.text?.toString() ?: ""
         viewModel.sondagem.value = etSondagem.text?.toString() ?: ""

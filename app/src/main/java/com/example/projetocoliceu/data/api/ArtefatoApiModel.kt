@@ -4,6 +4,8 @@ import com.example.projetocoliceu.data.model.Artefato
 
 data class ArtefatoApiModel(
     val id: String,
+    val nome: String,
+    val mapId: String,
     val quadra: String,
     val area: String,
     val sondagem: String,

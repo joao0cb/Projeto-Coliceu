@@ -49,7 +49,7 @@ class LoginFragment : Fragment() {
         val tvIrParaCadastro = view.findViewById<TextView>(R.id.tvIrParaCadastro)
 
         tvIrParaCadastro.setOnClickListener {
-            findNavController().navigate(R.id.action_login_to_cadastro)
+            findNavController().navigate(R.id.action_login_to_mapa)
         }
 
         // --- 2. LÓGICA DE CLIQUE: CHAMA O VIEWMODEL ---

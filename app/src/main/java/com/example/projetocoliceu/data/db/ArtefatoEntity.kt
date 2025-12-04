@@ -10,7 +10,8 @@ data class ArtefatoEntity(
     // 1. Identificação
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-
+    val nome: String,
+    val mapId: String,
 
     val quadra: String,
     val area: String,
