@@ -80,6 +80,10 @@ class MapaArqueologicoFragment : Fragment(R.layout.fragment_map) {
         val customMap = binding.map
         customMap.setViewModel(mapViewModel)
 
+        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.imagem_mapa)
+        binding.map.setBackgroundImage(bitmap)
+
+
         mapViewModel.artefatos.observe(viewLifecycleOwner) { lista ->
             customMap.setArtefatos(lista)
         }
