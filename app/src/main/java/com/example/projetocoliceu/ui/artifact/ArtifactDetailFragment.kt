@@ -25,17 +25,18 @@ import com.example.projetocoliceu.viewmodel.MapViewModel
 import com.example.projetocoliceu.viewmodel.MapViewModelFactory
 
 class ArtifactDetailFragment : Fragment() {
-    private var hasSaved = false
 
     private val args: ArtifactDetailFragmentArgs by navArgs()
-    private val viewModel: ArtifactViewModel by lazy {
+
+    // 🔥 MUDANÇA: Usar activityViewModels para compartilhar o ViewModel
+    private val viewModel: ArtifactViewModel by activityViewModels {
         ArtifactViewModelFactory(
             ArtefatoRepository(
                 apiService = RetrofitClient.apiService,
                 dao = AppDatabase.getDatabase(requireContext()).artefatoDao(),
                 context = requireContext()
             )
-        ).create(ArtifactViewModel::class.java)
+        )
     }
 
     private val mapViewModel: MapViewModel by activityViewModels {
@@ -78,8 +79,12 @@ class ArtifactDetailFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val mapId = args.mapId
-        viewModel.setMapId(mapId)
+        super.onViewCreated(view, savedInstanceState)
+
+        // 🔥 Aguarda o ViewModel estar pronto
+        // O mapId JÁ FOI SETADO no MapaArqueologicoFragment via activityViewModels
+        Log.d("ArtifactDetailFragment", "Iniciando fragment...")
+
         // Inicializa campos a partir do binding
         etNome = binding.etNome
         etArea = binding.etArea
@@ -104,25 +109,27 @@ class ArtifactDetailFragment : Fragment() {
 
         // Salvar/Atualizar
         btnSalvar.setOnClickListener {
-            Toast.makeText(requireContext(), "Clique detectado!", Toast.LENGTH_SHORT).show()
             transferFormToViewModel()
-            if (viewModel.mapId.value == null) {
+
+            val currentMapId = viewModel.mapId.value
+            Log.d("ArtifactDetailFragment", "Tentando salvar. MapId: $currentMapId")
+
+            if (currentMapId.isNullOrEmpty()) {
                 Snackbar.make(binding.root, "Erro: nenhum mapa selecionado!", Snackbar.LENGTH_LONG).show()
+                Log.e("ArtifactDetailFragment", "MapId está vazio!")
             } else {
+                Log.d("ArtifactDetailFragment", "Salvando artefato no mapa: $currentMapId")
                 viewModel.saveArtifact()
             }
         }
 
         // Deletar
         btnDeletar.setOnClickListener {
-            // Somente se estivermos em modo edição
             val atual = viewModel.artefatoEditavel.value
             if (atual != null) {
                 viewModel.deleteArtifact(atual)
-                // Após deletar, volta ao mapa
                 findNavController().popBackStack()
             } else {
-                // Se não há artefato editável (modo criação), apenas volta
                 findNavController().popBackStack()
             }
         }
@@ -131,9 +138,25 @@ class ArtifactDetailFragment : Fragment() {
             abrirGaleria()
         }
 
-        // Toolbar voltar
         binding.btnVoltar.setOnClickListener{
             findNavController().navigateUp()
+        }
+
+        // Observa sucesso do salvamento
+        viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
+            if (success == true) {
+                val currentMapId = viewModel.mapId.value
+                Log.d("ArtifactDetailFragment", "Artefato salvo com sucesso! MapId: $currentMapId")
+
+                // Atualiza lista de artefatos do mapa
+                if (!currentMapId.isNullOrEmpty()) {
+                    mapViewModel.getArtifactsByMap(currentMapId)
+                }
+
+                // Limpa edição e volta
+                viewModel.clearEditionIfNeeded()
+                findNavController().popBackStack()
+            }
         }
 
         viewModel.deleteSuccess.observe(viewLifecycleOwner) { success ->
@@ -142,20 +165,6 @@ class ArtifactDetailFragment : Fragment() {
                 findNavController().popBackStack()
             }
         }
-
-        viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
-            if (success == true && !hasSaved) {
-                hasSaved = true
-                // Atualiza lista de artefatos do mapa
-                mapViewModel.getArtifactsByMap(viewModel.mapId.value!!)
-
-                // Limpa edição
-                viewModel.clearEditionIfNeeded()
-                // Fecha a tela APENAS se estiver salvando
-                findNavController().popBackStack()
-            }
-        }
-
     }
 
     private fun setupFormObservers(tvQuadraInfo: TextView) {
@@ -165,7 +174,6 @@ class ArtifactDetailFragment : Fragment() {
             val sondagem = viewModel.initialSondagem.value ?: "N/A"
             tvQuadraInfo.text = "Quadra: $quadra, Sondagem: $sondagem (x=${"%.2f".format(x)}, y=${"%.2f".format(y)})"
 
-            // Se modo criação preenche area com quadra
             if (viewModel.artefatoEditavel.value == null) {
                 etQuadra.setText(quadra)
             }

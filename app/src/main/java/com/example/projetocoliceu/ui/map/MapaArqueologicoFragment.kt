@@ -9,7 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs // <-- IMPORTANTE
+import androidx.navigation.fragment.navArgs
 import com.example.projetocoliceu.R
 import com.example.projetocoliceu.data.repository.ArtefatoRepository
 import com.example.projetocoliceu.databinding.FragmentMapBinding
@@ -24,8 +24,7 @@ import com.example.projetocoliceu.viewmodel.ArtifactViewModelFactory
 
 class MapaArqueologicoFragment : Fragment(R.layout.fragment_map) {
 
-    private var hasSaved = false
-    private val args by navArgs<MapaArqueologicoFragmentArgs>() // <-- AQUI
+    private val args by navArgs<MapaArqueologicoFragmentArgs>()
 
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
@@ -73,7 +72,7 @@ class MapaArqueologicoFragment : Fragment(R.layout.fragment_map) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val mapId = args.mapId  // <-- 🎯 Pegando o argumento enviado
+        val mapId = args.mapId
         mapViewModel.selectMap(mapId)
         mapViewModel.getArtifactsByMap(mapId)
 
@@ -93,6 +92,8 @@ class MapaArqueologicoFragment : Fragment(R.layout.fragment_map) {
                 artefato.yRelativo,
                 artefato.sondagem
             )
+            artifactViewModel.setMapId(mapId)
+
             findNavController().navigate(R.id.action_mapaArqueologico_to_artifactDetail)
         }
 
@@ -101,13 +102,10 @@ class MapaArqueologicoFragment : Fragment(R.layout.fragment_map) {
             artifactViewModel.setInitialCoordinates(quadra, xRel, yRel)
             artifactViewModel.resetSaveSuccess()
 
-            hasSaved = false
-
-            val mapId = mapViewModel.currentMapId.value ?: return@onNovoArtefatoClick
+            artifactViewModel.setMapId(mapId)
 
             val action = MapaArqueologicoFragmentDirections
                 .actionMapaArqueologicoToArtifactDetail(mapId = mapId)
-
             findNavController().navigate(action)
         }
 
@@ -119,6 +117,12 @@ class MapaArqueologicoFragment : Fragment(R.layout.fragment_map) {
             val action = MapaArqueologicoFragmentDirections
                 .actionMapaArqueologicoToArtifactList()
             findNavController().navigate(action)
+        }
+
+        artifactViewModel.artefatosUpdated.observe(viewLifecycleOwner) { updated ->
+            if (updated == true) {
+                mapViewModel.getArtifactsByMap(mapId)
+            }
         }
 
         binding.btnAdicionarBackground.setOnClickListener {
