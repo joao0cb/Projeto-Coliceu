@@ -102,8 +102,7 @@
 
         <argument
             android:name="mapId"
-            app:argType="string"
-            android:defaultValue="" />
+            app:argType="string" />
     </fragment>
 
 </navigation>

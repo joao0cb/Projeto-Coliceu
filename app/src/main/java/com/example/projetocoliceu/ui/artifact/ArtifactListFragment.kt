@@ -34,13 +34,13 @@ class ArtifactListFragment : Fragment() {
             )
         )
     }
-    // Shared ViewModel entre telas
-    private val viewModel: MapViewModel by activityViewModels {
+
+    private val mapViewModel: MapViewModel by activityViewModels {
         val database = AppDatabase.getDatabase(requireContext())
         MapViewModelFactory(
             ArtefatoRepository(
-                apiService = RetrofitClient.apiService,                       // sua API
-                dao = AppDatabase.getDatabase(requireContext()).artefatoDao(),
+                apiService = RetrofitClient.apiService,
+                dao = database.artefatoDao(),
                 context = requireContext()
             ),
             MapRepository(database.mapDao())
@@ -58,28 +58,34 @@ class ArtifactListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         adapter = ArtifactAdapter { artefato ->
-            // Abrir detalhes do artefato
-            val action =
-                ArtifactListFragmentDirections
-                    .actionArtifactListToArtifactDetail()
-            findNavController().navigate(action)
+            // Passa o artefato selecionado para o ViewModel
+            artifactViewModel.setArtifactToEdition(artefato)
+
+            // Navega para detalhes
+            findNavController().navigate(
+                ArtifactListFragmentDirections.actionArtifactListToArtifactDetail()
+            )
         }
 
         binding.recyclerViewArtifacts.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewArtifacts.adapter = adapter
 
-        // Observa mudanças nos artefatos do mapa
-        viewModel.artefatos.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+        // Observa somente os artefatos do mapa selecionado
+        mapViewModel.currentMapId.observe(viewLifecycleOwner) { mapId ->
+            if (mapId != null) {
+                mapViewModel.getArtifactsByMap(mapId)
+            } else {
+                Snackbar.make(view, "Nenhum mapa selecionado!", Snackbar.LENGTH_LONG).show()
+            }
         }
 
-        // Força recarregar ao entrar
-        viewModel.currentMapId.value?.let { mapId ->
-            viewModel.getArtifactsByMap(mapId)
-        } ?: Snackbar.make(view, "Erro: Nenhum mapa selecionado!", Snackbar.LENGTH_LONG).show()
+        mapViewModel.artefatos.observe(viewLifecycleOwner) { artefatosFiltrados ->
+            adapter.submitList(artefatosFiltrados)
+        }
 
-        binding.btnVoltar.setOnClickListener{
+        binding.btnVoltar.setOnClickListener {
             findNavController().navigateUp()
         }
     }

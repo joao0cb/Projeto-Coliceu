@@ -25,6 +25,7 @@ import com.example.projetocoliceu.viewmodel.MapViewModel
 import com.example.projetocoliceu.viewmodel.MapViewModelFactory
 
 class ArtifactDetailFragment : Fragment() {
+    private var hasSaved = false
 
     private val args: ArtifactDetailFragmentArgs by navArgs()
     private val viewModel: ArtifactViewModel by lazy {
@@ -79,11 +80,6 @@ class ArtifactDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val mapId = args.mapId
         viewModel.setMapId(mapId)
-        Log.d("ArtifactDetailFragment", "mapId recebido: $mapId")
-        if (mapId == null) {
-            Log.e("ArtifactDetailFragment", "Nenhum mapId recebido!")
-            return
-        }
         // Inicializa campos a partir do binding
         etNome = binding.etNome
         etArea = binding.etArea
@@ -140,15 +136,6 @@ class ArtifactDetailFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        // Observa sucesso do salvamento e fecha
-        viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
-            if (success == true) {
-                // limpa edição atual para evitar reaproveitamento indevido
-                viewModel.clearEditionIfNeeded()
-                findNavController().popBackStack()
-            }
-        }
-
         viewModel.deleteSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
                 viewModel.clearEditionIfNeeded()
@@ -157,12 +144,14 @@ class ArtifactDetailFragment : Fragment() {
         }
 
         viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
-            if (success == true) {
+            if (success == true && !hasSaved) {
+                hasSaved = true
                 // Atualiza lista de artefatos do mapa
                 mapViewModel.getArtifactsByMap(viewModel.mapId.value!!)
 
-                // Limpa edição e volta
+                // Limpa edição
                 viewModel.clearEditionIfNeeded()
+                // Fecha a tela APENAS se estiver salvando
                 findNavController().popBackStack()
             }
         }

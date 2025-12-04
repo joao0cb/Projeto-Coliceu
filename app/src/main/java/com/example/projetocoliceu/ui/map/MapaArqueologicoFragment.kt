@@ -1,9 +1,11 @@
 package com.example.projetocoliceu.ui.map
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -22,11 +24,21 @@ import com.example.projetocoliceu.viewmodel.ArtifactViewModelFactory
 
 class MapaArqueologicoFragment : Fragment(R.layout.fragment_map) {
 
+    private var hasSaved = false
     private val args by navArgs<MapaArqueologicoFragmentArgs>() // <-- AQUI
 
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
 
+    private val selectImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                val inputStream = requireContext().contentResolver.openInputStream(it)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream?.close()
+                binding.map.setBackgroundImage(bitmap)
+            }
+        }
     private val artifactViewModel: ArtifactViewModel by activityViewModels{
         ArtifactViewModelFactory(
             ArtefatoRepository(
@@ -89,8 +101,13 @@ class MapaArqueologicoFragment : Fragment(R.layout.fragment_map) {
             artifactViewModel.setInitialCoordinates(quadra, xRel, yRel)
             artifactViewModel.resetSaveSuccess()
 
+            hasSaved = false
+
+            val mapId = mapViewModel.currentMapId.value ?: return@onNovoArtefatoClick
+
             val action = MapaArqueologicoFragmentDirections
-                .actionMapaArqueologicoToArtifactDetail(mapId = mapViewModel.currentMapId.value ?: "")
+                .actionMapaArqueologicoToArtifactDetail(mapId = mapId)
+
             findNavController().navigate(action)
         }
 
@@ -102,6 +119,11 @@ class MapaArqueologicoFragment : Fragment(R.layout.fragment_map) {
             val action = MapaArqueologicoFragmentDirections
                 .actionMapaArqueologicoToArtifactList()
             findNavController().navigate(action)
+        }
+
+        binding.btnAdicionarBackground.setOnClickListener {
+            // Aqui você pode pegar a imagem de recursos ou abrir um seletor de arquivos
+            selectImageLauncher.launch("image/*")
         }
     }
 

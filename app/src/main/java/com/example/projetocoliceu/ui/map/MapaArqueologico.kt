@@ -9,11 +9,17 @@ import android.view.MotionEvent
 import android.view.View
 import com.example.projetocoliceu.data.model.Artefato
 import com.example.projetocoliceu.viewmodel.MapViewModel
-
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 // Esta classe herda de View e serve como o seu mapa cartesiano customizado.
 class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, attrs){
 
+    private var backgroundBitmap: Bitmap? = null // <-- Nova variável
     // O ViewModel será injetado pela Activity
+    fun setBackgroundImage(bitmap: Bitmap) {
+        backgroundBitmap = bitmap
+        invalidate() // redesenha a View
+    }
     private lateinit var viewModel: MapViewModel
 
     // Callback de clique no artefato dentro do CustomView
@@ -58,6 +64,15 @@ class MapaArqueologico(context: Context, attrs: AttributeSet?) : View(context, a
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
+        backgroundBitmap?.let {
+            canvas.drawBitmap(
+                Bitmap.createScaledBitmap(it, width, height, true),
+                0f,
+                0f,
+                null
+            )
+        }
 
         val quadraPixelLargura = width.toFloat() / NUM_COLUNAS
         val quadraPixelAltura = height.toFloat() / NUM_LINHAS
