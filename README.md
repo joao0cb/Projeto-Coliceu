@@ -36,10 +36,6 @@ Nosso projeto propõe um aplicativo mobile desenvolvido em Kotlin e Java que per
 - Android Studio
 - Room Database
 
-# Trello 
-
-![quadro](./assets/QuadroAtualizado.png)
-
 # Fluxograma
 
-![projeto]()
+![projeto](/Fluxograma.drawio.png)
