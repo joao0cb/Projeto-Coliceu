@@ -78,7 +78,11 @@
 
         <action
             android:id="@+id/action_mapaArqueologico_to_artifactDetail"
-            app:destination="@id/artifactDetailFragment" />
+            app:destination="@id/artifactDetailFragment">
+            <argument
+                android:name="mapId"
+                app:argType="string" />
+        </action>
     </fragment>
 
     <!-- Lista de Artefatos -->
@@ -90,7 +94,12 @@
 
         <action
             android:id="@+id/actionArtifactListToArtifactDetail"
-            app:destination="@id/artifactDetailFragment" />
+            app:destination="@id/artifactDetailFragment">
+            <argument
+                android:name="mapId"
+                app:argType="string"
+                android:defaultValue="" />
+        </action>
     </fragment>
 
     <!-- Detalhes do Artefato -->
